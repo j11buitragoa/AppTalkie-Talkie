@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".cofi_dur">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-1dp" />
+
+    <Button
+        android:id="@+id/inicioButton"
+        android:layout_width="181dp"
+        android:layout_height="68dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="84dp"
+        android:text="Enviar datos"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.086"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints,VisualLintButtonSize" />
+
+    <EditText
+        android:id="@+id/Cuantos"
+        android:layout_width="347dp"
+        android:layout_height="102dp"
+        android:layout_marginBottom="548dp"
+        android:ems="10"
+        android:hint="Ingresa cuantos veces quiere que se repita  "
+        android:inputType="number"
+        android:minHeight="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.388"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/salir"
+        android:layout_width="168dp"
+        android:layout_height="62dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="88dp"
+        android:text="Comenzar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/inicioButton"
+        tools:ignore="MissingConstraints" />
+
+    <EditText
+        android:id="@+id/ingresarTiempoSilencio"
+        android:layout_width="345dp"
+        android:layout_height="62dp"
+        android:layout_marginTop="32dp"
+        android:ems="10"
+        android:hint="Ingrese el tiempo de silencio entre repetecion"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Cuantos"
+        app:layout_constraintVertical_bias="0.008" />
+
+    <EditText
+        android:id="@+id/ingresarTiempoEditText"
+        android:layout_width="347dp"
+        android:layout_height="87dp"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:hint="Ingrese el tiempo de duración que quiere que la persona mantenga"
+        app:layout_constraintBottom_toTopOf="@+id/inicioButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.484"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ingresarTiempoSilencio"
+        app:layout_constraintVertical_bias="0.133"
+        tools:ignore="MissingConstraints" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
