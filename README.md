@@ -1,5 +1,6 @@
 # AppTalkie-Talkie
-##Aplicación de apoyo para el entrenamiento del habla en personas con discapacidad auditiva.
+![Logo del Proyecto](https://imgur.com/a/VAst0YH)
+Aplicación de apoyo para el entrenamiento del habla en personas con discapacidad auditiva.
 La aplicación se desarrolla en Java a través de Android Studio y utiliza la conexión Bluetooth de dos altavoces como vibro-táctiles. 
 Personalización de Ecualización: Integra la ecualización en dos transductores para una experiencia más completa.
 Entrenamiento de Sensibilidad: Implementa vibro-táctiles para la discriminación de información entre altavoces A y B.
