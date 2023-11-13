@@ -1,9 +1,12 @@
 # AppTalkie-Talkie
-![Logo del Proyecto](https://imgur.com/a/VAst0YH)
-Aplicación de apoyo para el entrenamiento del habla en personas con discapacidad auditiva.
-La aplicación se desarrolla en Java a través de Android Studio y utiliza la conexión Bluetooth de dos altavoces como vibro-táctiles. 
-Personalización de Ecualización: Integra la ecualización en dos transductores para una experiencia más completa.
-Entrenamiento de Sensibilidad: Implementa vibro-táctiles para la discriminación de información entre altavoces A y B.
-Entrenamiento del Habla: Se basa en el sistema DASL de la Universidad de Houston para ejercicios de intensidad, durabilidad y tono, con retroalimentación sensitiva.
+## Descripción
+aplicación diseñada en Java a través de Android Studio, que utiliza la conexión Bluetooth de dos altavoces como vibro-táctiles. Su enfoque principal es el apoyo para el entrenamiento del habla en personas con discapacidad auditiva.
+
+## Características Clave
+### Personalización de Ecualización: Ofrece una experiencia completa al integrar la ecualización en dos transductores.
+### Entrenamiento de Sensibilidad: Utiliza vibro-táctiles para la discriminación de información entre altavoces A y B.
+### Entrenamiento del Habla: Basado en el sistema DASL de la Universidad de Houston, incluye ejercicios de intensidad, durabilidad y tono con retroalimentación sensitiva.
+## Usuarios
+La aplicación está diseñada para dos tipos de usuarios:
 Usuario Administrador: Terapeutas o expertos pueden ajustar variables en los ejercicios para adaptarse al progreso del paciente.
 Usuario Final: Niños de 5 a 14 años que deseen utilizar la aplicación.
