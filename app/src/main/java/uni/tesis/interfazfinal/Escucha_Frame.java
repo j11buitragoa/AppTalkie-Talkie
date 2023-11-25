@@ -22,17 +22,17 @@ public class Escucha_Frame extends AppCompatActivity {
         backButton = findViewById(R.id.backButton);
 
         hearTimeButton.setOnClickListener(view -> {
-            Intent goTime = new Intent(this, Escucha_Tiempo.class);
+            Intent goTime = new Intent(this, Ready_Tiempo.class);
             startActivity(goTime);
         });
 
         hearFreqButton.setOnClickListener(view -> {
-            Intent goFreq = new Intent(this, Escucha_Frecuencia.class);
+            Intent goFreq = new Intent(this, Ready_frec1.class);
             startActivity(goFreq);
         });
 
         hearOrderButton.setOnClickListener(view -> {
-            Intent goOrder = new Intent(this, Escucha_Orden.class);
+            Intent goOrder = new Intent(this, Ready_Orden.class);
             startActivity(goOrder);
         });
 

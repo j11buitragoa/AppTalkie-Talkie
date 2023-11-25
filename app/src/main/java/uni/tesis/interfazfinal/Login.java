@@ -43,7 +43,7 @@ public class Login extends AppCompatActivity {
     private FirebaseFirestore db;
     private String TAG = "TAG";
 
-    private final String USERS_COLLECTION = "Usuarios";
+    private final String USERS_COLLECTION = "User";
     private final String AGE = "Edad";
     private final String NAME = "Nombre";
     private final String USERNAME = "Username";

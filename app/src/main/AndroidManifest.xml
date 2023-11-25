@@ -15,6 +15,27 @@
         android:theme="@style/Theme.InterfazFinal"
         tools:targetApi="31">
         <activity
+            android:name=".Ready_frec2"
+            android:exported="false" />
+        <activity
+            android:name=".Ready_Tono"
+            android:exported="false" />
+        <activity
+            android:name=".Ready_duracion"
+            android:exported="false" />
+        <activity
+            android:name=".Ready_Int"
+            android:exported="false" />
+        <activity
+            android:name=".Ready_Orden"
+            android:exported="false" />
+        <activity
+            android:name=".Ready_frec1"
+            android:exported="false" />
+        <activity
+            android:name=".Ready_Tiempo"
+            android:exported="false" />
+        <activity
             android:name=".tono"
             android:exported="false" />
         <activity

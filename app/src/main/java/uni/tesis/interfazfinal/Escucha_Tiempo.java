@@ -36,7 +36,7 @@ public class Escucha_Tiempo extends AppCompatActivity {
     private Button readyButton, toneButton1, toneButton2, backButton;
     private String TAG = "TAG";
 
-    private final String USERS_COLLECTION = "Usuarios";
+    private final String USERS_COLLECTION = "User";
     private final String HEAR_COLLECTION = "HEAR";
     private final String TALK_COLLECTION = "TALK";
     private FirebaseAuth mAuth;
@@ -330,7 +330,9 @@ public class Escucha_Tiempo extends AppCompatActivity {
     }
 
     private void sendDataBase(DocumentReference doc, int[][] matrix, int level, int pointsWIN){
+        String userId = user.getUid();  // ID del usuario
         Map<String, Object> mapa = new HashMap<>();
+        String ejercicioId = "Ejercicio_" + level;
         // String tmp1, tmp2;
         List<Integer> tiemposRespuesta = new ArrayList<>();
         List<String> resultado = new ArrayList<>();
@@ -352,4 +354,5 @@ public class Escucha_Tiempo extends AppCompatActivity {
             }
         });
     }
+
 }

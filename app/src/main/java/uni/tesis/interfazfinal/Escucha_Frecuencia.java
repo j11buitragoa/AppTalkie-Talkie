@@ -1,6 +1,7 @@
 package uni.tesis.interfazfinal;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import android.content.Intent;
 import android.media.AudioFormat;
@@ -8,8 +9,10 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,6 +38,7 @@ public class Escucha_Frecuencia extends AppCompatActivity {
     private FirebaseUser user;
     private CollectionReference hearCollection;
     private DocumentReference hearFreqDocument;
+    private boolean stopPlayback = false;
 
     private int currentLevel = 1, successPoints, faultPoints, currentPatternIndex;
     private final int maxLevel = 4, pointsToPass = 5;
@@ -43,24 +47,26 @@ public class Escucha_Frecuencia extends AppCompatActivity {
     private int[][] freqDiffArray = new int[maxLevel][pointsToPass];
     private int checkCondition = 0;
     private long responseTime;
-    private int[][] resultsLevel = new int[pointsToPass][4]; // Col0: resultado Col1: tiempoRespuesta Col2:freq1 Col3:freq2
 
+    private int[][] resultsLevel = new int[pointsToPass][4]; // Col0: resultado Col1: tiempoRespuesta Col2:freq1 Col3:freq2
 
     String TAG = "TAG";
     private Button sameButton, diffButton, highButton, lowButton, backButton;
     private TextView levelText, scoreText;
-
+    private boolean instructionsVisible = false;
+    private boolean instructionsHandled = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_escucha_frecuencia);
-
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
         hearCollection = db.collection(USERS_COLLECTION).document(user.getEmail()).collection(HEAR_COLLECTION);
         hearFreqDocument = hearCollection.document("Frecuencia");
 
+        CardView instructionsCardView = findViewById(R.id.instructionsCardView);
+        Button okButton = findViewById(R.id.okf2);
         sameButton = findViewById(R.id.same_button);
         diffButton = findViewById(R.id.diff_button);
         highButton = findViewById(R.id.high_button);
@@ -103,7 +109,12 @@ public class Escucha_Frecuencia extends AppCompatActivity {
             diffButton.setVisibility(View.VISIBLE);
             highButton.setVisibility(View.GONE);
             lowButton.setVisibility(View.GONE);
-        }else {
+
+        } else {
+            if (!instructionsVisible && !instructionsHandled) {
+                showInstr();
+                instructionsVisible = true; // Marcar las instrucciones como mostradas
+            }
             diffButton.setVisibility(View.GONE);
             highButton.setVisibility(View.VISIBLE);
             lowButton.setVisibility(View.VISIBLE);
@@ -112,8 +123,26 @@ public class Escucha_Frecuencia extends AppCompatActivity {
         successPoints = 0;
         faultPoints = 0;
         setFrequencies();
-
         functionRunnablePlayFreq();
+    }
+
+    private void showInstr(){
+        Log.d(TAG, "Mostrando instrucciones");
+
+        CardView instructionsCardView = findViewById(R.id.instructionsCardView);
+        Button okButton = findViewById(R.id.okf2);
+        Log.d(TAG, "Visibilidad antes: " + instructionsCardView.getVisibility());
+
+        instructionsCardView.setVisibility(View.VISIBLE);
+        Log.d(TAG, "Visibilidad después: " + instructionsCardView.getVisibility());
+
+        okButton.setOnClickListener(v -> {
+            instructionsCardView.setVisibility(View.GONE);
+            if (currentLevel != 4) {
+                instructionsHandled = true; // Marcar las instrucciones como manejadas
+                functionRunnablePlayFreq();
+            }
+        });
     }
 
     private void setFrequencies(){
@@ -160,7 +189,7 @@ public class Escucha_Frecuencia extends AppCompatActivity {
             else checkCondition = 2;
         }
 
-        while (isRunning){
+        while (isRunning ){
             if (times < 2){
                 if (played == top) {
                     if (times == 0){
@@ -226,8 +255,10 @@ public class Escucha_Frecuencia extends AppCompatActivity {
     }
 
     private void updateUI(){
-        levelText.setText("Level " + currentLevel);
-        scoreText.setText("Score " + successPoints);
+        if (levelText != null && scoreText != null) {
+            levelText.setText("Level " + currentLevel);
+            scoreText.setText("Score " + successPoints);
+        }
     }
 
     private void checkAnswer(int option){
@@ -265,6 +296,7 @@ public class Escucha_Frecuencia extends AppCompatActivity {
                 Log.d(TAG, "Fin del juego");
                 Intent goEscucha = new Intent(Escucha_Frecuencia.this, Escucha_Frame.class);
                 startActivity(goEscucha);
+                finish();
             }
         }
     }
