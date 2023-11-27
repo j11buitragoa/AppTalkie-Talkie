@@ -47,10 +47,9 @@
                 android:layout_width="272dp"
                 android:layout_height="47dp"
                 android:layout_marginTop="5dp"
-                android:paddingStart="15dp"
                 android:textSize="20sp"
+                android:textAlignment="center"
                 android:background="@drawable/custom_edittext"
-                android:padding="8dp"
                 android:inputType="number"/>
 
             <TextView
@@ -69,10 +68,9 @@
                 android:layout_width="272dp"
                 android:layout_height="47dp"
                 android:layout_marginTop="5dp"
-                android:paddingStart="15dp"
                 android:textSize="20sp"
+                android:textAlignment="center"
                 android:background="@drawable/custom_edittext"
-                android:padding="8dp"
                 android:inputType="number"/>
 
             <TextView
@@ -91,10 +89,9 @@
                 android:layout_width="272dp"
                 android:layout_height="47dp"
                 android:layout_marginTop="5dp"
-                android:paddingStart="15dp"
                 android:textSize="20sp"
+                android:textAlignment="center"
                 android:background="@drawable/custom_edittext"
-                android:padding="8dp"
                 android:inputType="number"/>
 
             <TextView
@@ -113,10 +110,9 @@
                 android:layout_width="272dp"
                 android:layout_height="47dp"
                 android:layout_marginTop="5dp"
-                android:paddingStart="15dp"
                 android:textSize="20sp"
+                android:textAlignment="center"
                 android:background="@drawable/custom_edittext"
-                android:padding="8dp"
                 android:inputType="number"/>
 
             <Button
@@ -136,7 +132,7 @@
                 android:backgroundTint="@color/dark_grey"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="20dp"
-                android:text="Cancelar"
+                android:text="Volver"
                 android:textSize="18sp"
                 app:cornerRadius="20dp"/>
 

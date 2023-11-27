@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         docUsers.get().addOnSuccessListener(documentSnapshot ->
-                nameTittle.setText("Hola " + documentSnapshot.getString("nombre")));
+                nameTittle.setText("Hola " + extraerNombre(documentSnapshot.getString("nombre"))));
 
         escuchaButton.setOnClickListener(view -> {
             Intent goEscucha = new Intent(this, Escucha_Frame.class);
@@ -98,5 +98,15 @@ public class MainActivity extends AppCompatActivity {
         valuePoints.setText(myApp.getTotalPointsAsString());
     }
 
+    private String extraerNombre(String nombreCompleto){
+        String resultado;
+        String[] palabras = nombreCompleto.split(" ");
+        if (palabras.length > 0) {
+            resultado =  palabras[0];
+        }else {
+            resultado = nombreCompleto;
+        }
+        return resultado;
+    }
 
 }

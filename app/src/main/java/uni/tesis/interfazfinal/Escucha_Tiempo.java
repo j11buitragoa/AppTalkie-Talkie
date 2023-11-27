@@ -64,7 +64,7 @@ public class Escucha_Tiempo extends AppCompatActivity {
 
     private final int SAMPLE_RATE = 4025;
     private final int NUM_LEVELS = 3;
-    private final int POINTS_TO_WIN = 4;
+    private int POINTS_TO_WIN = 4;
     private int durationInMs = 500;
     private int timeBetweenTones = 1000;
     private int freqTone = 300;
@@ -91,6 +91,20 @@ public class Escucha_Tiempo extends AppCompatActivity {
          ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
 
         Log.d(TAG, "user " + user.getDisplayName() + "\nID " + user.getUid());
+
+        Intent intent = getIntent();
+        ArrayList<String> nivel1 = intent.getStringArrayListExtra("Nivel 1");
+        ArrayList<String> nivel2 = intent.getStringArrayListExtra("Nivel 2");
+        ArrayList<String> nivel3 = intent.getStringArrayListExtra("Nivel 3");
+
+        if (nivel1 == null || nivel2 == null || nivel3 == null){
+            Log.d(TAG, "Dato NULL");
+        }else {
+            durationInMs = Integer.parseInt(nivel1.get(0));
+            freqTone = Integer.parseInt(nivel1.get(1));
+            timeBetweenTones = Integer.parseInt(nivel1.get(2));
+            POINTS_TO_WIN = Integer.parseInt(nivel1.get(3));
+        }
 
         levelTextView = findViewById(R.id.levelTextView);
         pointsTextView = findViewById(R.id.pointsTextView);

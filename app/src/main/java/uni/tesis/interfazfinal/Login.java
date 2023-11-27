@@ -53,8 +53,8 @@ public class Login extends AppCompatActivity {
     private String TAG = "TAG";
 
     private final String USERS_COLLECTION = "User";
-    private final String AGE = "Edad";
-    private final String NAME = "Nombre";
+    private final String AGE = "edad";
+    private final String NAME = "nombre";
     private final String TYPE_DEV = "tipo de dispositivo";
     private final String ADMIN = "es admin";
     private final String SEXO = "sexo";

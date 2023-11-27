@@ -47,11 +47,12 @@ public class Escucha_Frecuencia extends AppCompatActivity {
     private boolean stopPlayback = false;
 
     private int currentLevel = 1, successPoints, faultPoints, currentPatternIndex;
-    private final int maxLevel = 4, pointsToPass = 5;
+    private int maxLevel = 4, pointsToPass = 5;
     private int[][] rangeFreq = {{500, 1000}, {350, 500}, {500, 1000}, {350, 500}};
     private final int freqCentral = 300;
     private int[][] freqDiffArray = new int[maxLevel][pointsToPass];
     private int checkCondition = 0;
+    private int duration = 1000;
     private long responseTime;
     private DocumentReference hearFreqDocument;
     private int[][] resultsLevel = new int[pointsToPass][4]; // Col0: resultado Col1: tiempoRespuesta Col2:freq1 Col3:freq2
@@ -72,6 +73,44 @@ public class Escucha_Frecuencia extends AppCompatActivity {
 
         String nombreEjercicio = "Ejercicio_" + currentLevel;
         ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
+
+        Intent intent = getIntent();
+        ArrayList<String> nivel1 = intent.getStringArrayListExtra("Nivel 1");
+        ArrayList<String> nivel2 = intent.getStringArrayListExtra("Nivel 2");
+        ArrayList<String> nivel3 = intent.getStringArrayListExtra("Nivel 3");
+        ArrayList<String> nivel4 = intent.getStringArrayListExtra("Nivel 4");
+
+        if (nivel1 == null || nivel2 == null || nivel3 == null || nivel4 == null){
+            Log.d(TAG, "Dato NULL");
+        }else {
+            duration = Integer.parseInt(nivel1.get(0));
+            pointsToPass = Integer.parseInt(nivel1.get(3));
+
+            for (int i = 0;i<maxLevel;i++){
+                int freqMin = 0, freqMax = 0;
+                switch (i){
+                    case 0:
+                        freqMin = Integer.parseInt(nivel1.get(1));
+                        freqMax = Integer.parseInt(nivel1.get(2));
+                        break;
+                    case 1:
+                        freqMin = Integer.parseInt(nivel2.get(1));
+                        freqMax = Integer.parseInt(nivel2.get(2));
+                        break;
+                    case 2:
+                        freqMin = Integer.parseInt(nivel3.get(1));
+                        freqMax = Integer.parseInt(nivel3.get(2));
+                        break;
+                    case 3:
+                        freqMin = Integer.parseInt(nivel4.get(1));
+                        freqMax = Integer.parseInt(nivel4.get(2));
+                        break;
+                }
+                rangeFreq[i][0] = freqMin;
+                rangeFreq[i][1] = freqMax;
+            }
+
+        }
 
         CardView instructionsCardView = findViewById(R.id.instructionsCardView);
         Button okButton = findViewById(R.id.okf2);
@@ -167,7 +206,7 @@ public class Escucha_Frecuencia extends AppCompatActivity {
         boolean isRunning =true;
         int top = 0, played = 0, gain = 1, bufferSize, times = 0, freqTone, freqTone1, freqTone2, aux;
         int sampleRate = 8000;
-        int duration = 1000, waitTime = 200;
+        int waitTime = 200;
         // int channel = getRandomInt(1, 2);
         int channel = 1;
         short[] left, right, tone;

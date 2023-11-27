@@ -112,6 +112,22 @@ public class Ready_frec1 extends AppCompatActivity {
                     //Toast.makeText(Login.this, "Por favor, seleccione una opción", Toast.LENGTH_SHORT).show();
                 }else {
                     selectLevel = parent.getItemAtPosition(position).toString();
+                    switch (selectLevel){
+                        case "Nivel 1":
+                        case "Nivel 3":
+                            editDuracion.setText("1000");
+                            editFreqMin.setText("500");
+                            editFreqMax.setText("1000");
+                            editIntentos.setText("5");
+                            break;
+                        case "Nivel 2":
+                        case "Nivel 4":
+                            editDuracion.setText("1000");
+                            editFreqMin.setText("350");
+                            editFreqMax.setText("500");
+                            editIntentos.setText("5");
+                            break;
+                    }
                 }
             }
 
