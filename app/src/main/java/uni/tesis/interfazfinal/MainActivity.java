@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -49,19 +50,19 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        DocumentReference docUsers = db.collection(USERS_COLLECTION).document(mAuth.getCurrentUser().getEmail());
+
         ImageView logout=findViewById(R.id.logout);
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Llamada a la función de log out
-                logout();
-            }
+        logout.setOnClickListener(view -> {
+            // Llamada a la función de log out
+            logout();
         });
+
         if(mAuth.getCurrentUser().getEmail().equals("admin@app.com")){
         }
 
-        db.collection(USERS_COLLECTION).document(mAuth.getCurrentUser().getEmail()).get().addOnSuccessListener(documentSnapshot ->
-                nameTittle.setText("Hola " + documentSnapshot.getString("Nombre")));
+        docUsers.get().addOnSuccessListener(documentSnapshot ->
+                nameTittle.setText("Hola " + documentSnapshot.getString("nombre")));
 
         escuchaButton.setOnClickListener(view -> {
             Intent goEscucha = new Intent(this, Escucha_Frame.class);
