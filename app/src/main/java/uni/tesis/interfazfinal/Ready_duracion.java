@@ -14,7 +14,7 @@ public class Ready_duracion extends AppCompatActivity {
         setContentView(R.layout.activity_ready_duracion);
         ok=findViewById(R.id.ok);
         ok.setOnClickListener(view -> {
-            Intent goTime = new Intent(this,duracion.class);
+            Intent goTime = new Intent(this,cofi_dur.class);
             startActivity(goTime);
         });
     }

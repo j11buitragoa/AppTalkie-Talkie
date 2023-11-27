@@ -18,7 +18,7 @@ public class Escucha_Frame extends AppCompatActivity {
         hearTimeButton = findViewById(R.id.timeButton);
         hearFreqButton = findViewById(R.id.freqButton);
         hearOrderButton = findViewById(R.id.orderButton);
-        hearVowelsButton = findViewById(R.id.vowelsButton);
+        //hearVowelsButton = findViewById(R.id.vowelsButton);
         backButton = findViewById(R.id.backButton);
 
         hearTimeButton.setOnClickListener(view -> {
@@ -36,10 +36,6 @@ public class Escucha_Frame extends AppCompatActivity {
             startActivity(goOrder);
         });
 
-        hearVowelsButton.setOnClickListener(view -> {
-            Intent goVowels = new Intent(this, Escucha_Vocales.class);
-            startActivity(goVowels);
-        });
 
         backButton.setOnClickListener(v -> {
             Intent goMenu = new Intent(this, MainActivity.class);

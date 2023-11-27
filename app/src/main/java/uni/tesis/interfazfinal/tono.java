@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.icu.text.DateFormat;
+import android.icu.text.SimpleDateFormat;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -33,7 +35,10 @@ import com.google.firebase.firestore.SetOptions;
 
 import org.jtransforms.fft.DoubleFFT_1D;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class tono extends AppCompatActivity {
@@ -72,7 +77,9 @@ public class tono extends AppCompatActivity {
     private long tiempoDeRespuesta = 0;
     private  int numIntentos = 0;
     private boolean isVolupVisible = false;
-    private final String USERS_COLLECTION = "Usuarios";
+    private final String USERS_COLLECTION = "User";
+    private final String EJERCICIOS_COLLECTION="Ejercicios";
+
     private final String TALK_COLLECTION = "TALK";
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -84,6 +91,8 @@ public class tono extends AppCompatActivity {
     private double umbral = 1000;
 
     private boolean shouldShowButton = true;
+    private DocumentReference ejercicioDoc;
+    private DocumentReference userDocRef;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +104,10 @@ public class tono extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
-        talkCollection = db.collection(USERS_COLLECTION).document(user.getEmail()).collection(TALK_COLLECTION);
-        talktonoDocument = talkCollection.document("Tono ");
+        userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+
+        String nombreEjercicio = "Ejercicio_" + 14;
+        ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
 
         audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, intRecordSampleRate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, intMicBufferSize, AudioTrack.MODE_STREAM);
         intStereoBufferSize = intMicBufferSize * 2;
@@ -382,18 +393,43 @@ public class tono extends AppCompatActivity {
 
 
     }
+
     private void sendDataBase(DocumentReference doc){
 
+        SharedPreferences preferences = getSharedPreferences("tono", Context.MODE_PRIVATE);
+        String selectedItem = preferences.getString("selectedItem", "");
         Map<String, Object> datosUsuario = new HashMap<>();
         datosUsuario.put("aciertos", aciertos);
         datosUsuario.put("fallos", fallos);
-        datosUsuario.put("tiempo_respuesta", tiempoDeRespuesta);
-        datosUsuario.put("num_intentos", numIntentos);
-        datosUsuario.put("Tiempo de silencio por intento", tiempoSilencioPorIntento);
-        datosUsuario.put("Tiempo de habla por intento", tiempoHablaPorIntento);
-        datosUsuario.put("Tiempo de acierto", tiempoAcierto);
+        datosUsuario.put("Tiempo de silencio ", tiempoSilencioPorIntento);
+        datosUsuario.put("Tono",selectedItem);
+        datosUsuario.put("Ejercio",ejercicioDoc);
+        DocumentReference userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+        datosUsuario.put("User",userDocRef);
+        Date fechaActual = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String fechaHora = dateFormat.format(fechaActual);
+        datosUsuario.put("fecha",fechaHora);
+        // Agrega el nuevo intento a la colección "Intentos"
+        db.collection("Intentos")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int numIntentos = queryDocumentSnapshots.size();
+                    String intentoNombre = "Intento_" + (numIntentos + 1);
 
-        doc.set(datosUsuario, SetOptions.merge()).addOnSuccessListener(unused -> Log.d(TAG, "Enviado"));
+                    db.collection("Intentos")
+                            .document(intentoNombre)
+                            .set(datosUsuario)
+                            .addOnSuccessListener(documentReference -> {
+                                Log.d(TAG, "Datos del intento enviados correctamente");
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error al enviar datos del intento", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error al obtener la cantidad de intentos", e);
+                });
     }
     double[] shortToDouble(short[] input) {
         double[] output = new double[input.length];

@@ -3,6 +3,7 @@ package uni.tesis.interfazfinal;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.icu.util.Calendar;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -20,22 +21,28 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
 public class Escucha_Orden extends AppCompatActivity {
 
     private String TAG = "START";
-    private final String USERS_COLLECTION = "Usuarios";
-    private final String HEAR_COLLECTION = "HEAR";
+    private final String USERS_COLLECTION = "User";
+    private final String EJERCICIOS_COLLECTION="Ejercicios";
+
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private FirebaseUser user;
-    private CollectionReference hearCollection;
     private DocumentReference hearOrderDocument;
+    private DocumentReference ejercicioDoc;
+    private DocumentReference userDocRef;
     private int currentLevel = 1;
     private int currentPatternIndex = 0, currentPatternIndex2 = 0;
     private int pointsToPassLevel = 3, successCount = 0, faultCount = 0;
@@ -70,8 +77,11 @@ public class Escucha_Orden extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
-        hearCollection = db.collection(USERS_COLLECTION).document(user.getEmail()).collection(HEAR_COLLECTION);
-        hearOrderDocument = hearCollection.document("Order");
+        userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+
+        String nombreEjercicio = "Ejercicio_" + currentLevel;
+        ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
+
 
         leftButton = findViewById(R.id.left_button);
         rightButton = findViewById(R.id.right_button);
@@ -116,7 +126,7 @@ public class Escucha_Orden extends AppCompatActivity {
         }
         if (successCount+faultCount >= pointsToPassLevel){
             responseTime = System.currentTimeMillis() - responseTime;
-            sendDataBase(hearOrderDocument, resultsLevel, currentLevel, pointsToPassLevel);
+            sendDataBase(user.getUid(),hearOrderDocument, resultsLevel, currentLevel, pointsToPassLevel);
             if (successCount == pointsToPassLevel){
                 currentLevel++;
                 if (currentLevel <= maxLevel){
@@ -262,7 +272,14 @@ public class Escucha_Orden extends AppCompatActivity {
         }
     }
 
-    private void sendDataBase(DocumentReference doc, int[][] matrix, int level, int pointsWIN){
+    private DocumentReference getEjercicioDocument(int currentLevel) {
+        currentLevel=currentLevel+7;
+        String nombreEjercicio = "Ejercicio_" + currentLevel;
+        return db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
+    }
+    private void sendDataBase(String userId,DocumentReference userdoc, int[][] matrix, int level, int pointsWIN){
+        DocumentReference ejercicioDoc = getEjercicioDocument(level);
+
         Map<String, Object> mapa = new HashMap<>();
         List<String> resultado = new ArrayList<>();
         List<String> patron = new ArrayList<>();
@@ -278,7 +295,32 @@ public class Escucha_Orden extends AppCompatActivity {
         mapa.put("Result Level " + level, resultado);
         mapa.put("Time Level " + level, responseTime);
         mapa.put("Pattern Level " + level, patron);
+        mapa.put("Ejercicio",ejercicioDoc);
+        DocumentReference userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+        mapa.put("User",userDocRef);
+        Date fechaActual = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String fechaHora = dateFormat.format(fechaActual);
+        mapa.put("fecha",fechaHora);
+        // Agrega el nuevo intento a la colección "Intentos"
+        db.collection("Intentos")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int numIntentos = queryDocumentSnapshots.size();
+                    String intentoNombre = "Intento_" + (numIntentos + 1);
 
-        doc.set(mapa, SetOptions.merge()).addOnSuccessListener(unused -> Log.d(TAG, "Enviado"));
+                    db.collection("Intentos")
+                            .document(intentoNombre)
+                            .set(mapa)
+                            .addOnSuccessListener(documentReference -> {
+                                Log.d(TAG, "Datos del intento enviados correctamente");
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error al enviar datos del intento", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error al obtener la cantidad de intentos", e);
+                });
     }
 }

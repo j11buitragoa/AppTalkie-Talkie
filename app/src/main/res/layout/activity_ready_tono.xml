@@ -11,10 +11,11 @@
 
 
     <androidx.cardview.widget.CardView
-        android:layout_width="381dp"
-        android:layout_height="712dp"
+        android:layout_width="345dp"
+        android:layout_height="642dp"
         android:layout_centerInParent="true"
         android:layout_margin="-500dp"
+        android:layout_marginBottom="1dp"
         android:background="@drawable/custom_edittext"
         android:translationY="-10dp"
         app:cardCornerRadius="30dp">
@@ -136,7 +137,7 @@
 
             <TextView
                 android:id="@+id/textView12"
-                android:layout_width="match_parent"
+                android:layout_width="292dp"
                 android:layout_height="wrap_content"
                 android:text="Cuando se vaya la imagen de silencio \n sigue el ejercicio \n Completa varias veces para ganar estrellas  "
                 android:textAlignment="center"

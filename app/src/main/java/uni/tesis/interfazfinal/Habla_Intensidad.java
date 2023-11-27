@@ -35,14 +35,21 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class Habla_Intensidad extends AppCompatActivity {
 
-    private final String USERS_COLLECTION = "Usuarios";
+    private final String USERS_COLLECTION = "User";
+    private final String EJERCICIOS_COLLECTION="Ejercicios";
+
     private final String HEAR_COLLECTION = "HEAR";
     private final String TALK_COLLECTION = "TALK";
     private FirebaseAuth mAuth;
@@ -50,7 +57,8 @@ public class Habla_Intensidad extends AppCompatActivity {
     private FirebaseUser user;
     private CollectionReference talkCollection;
     private DocumentReference talkIntensityDocument;
-
+    private DocumentReference ejercicioDoc;
+    private DocumentReference userDocRef;
     private static final int AUDIO_PERMISSION_REQUEST_CODE = 1;
     String TAG = "TAG";
 
@@ -88,8 +96,10 @@ public class Habla_Intensidad extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
-        talkCollection = db.collection(USERS_COLLECTION).document(user.getEmail()).collection(TALK_COLLECTION);
-        talkIntensityDocument = talkCollection.document("Intensidad");
+        user = mAuth.getCurrentUser();
+        userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+        String nombreEjercicio = "Ejercicio_" + 12;
+        ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
 
         surfaceView = findViewById(R.id.surfaceView);
         surfaceHolder = surfaceView.getHolder();
@@ -310,8 +320,12 @@ public class Habla_Intensidad extends AppCompatActivity {
             successMessage.drawSuccessMessage(0,ringSize,ringWidth);
         }
     }
-
-    private void sendDataBase(DocumentReference doc, int[][] matrix, int level, int pointsWIN){
+    private DocumentReference getEjercicioDocument(int level) {
+        String nombreEjercicio = "Ejercicio_" + 12;
+        return db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
+    }
+    private void sendDataBase(String userId, DocumentReference userdoc, int[][] matrix, int level, int pointsWIN){
+        DocumentReference ejercicioDoc = getEjercicioDocument(level);
         Map<String, Object> mapa = new HashMap<>();
         // String tmp1, tmp2;
         List<Integer> duration = new ArrayList<>();
@@ -327,13 +341,33 @@ public class Habla_Intensidad extends AppCompatActivity {
         mapa.put("Duration", duration);
         mapa.put("Size Ring", size);
         mapa.put("Width Ring", width);
+        mapa.put("Ejercicio",ejercicioDoc);
+        DocumentReference userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+        mapa.put("User",userDocRef);
+        Date fechaActual = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String fechaHora = dateFormat.format(fechaActual);
+        mapa.put("fecha",fechaHora);
+        // Agrega el nuevo intento a la colección "Intentos"
+        db.collection("Intentos")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int numIntentos = queryDocumentSnapshots.size();
+                    String intentoNombre = "Intento_" + (numIntentos + 1);
 
-        doc.set(mapa, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Log.d(TAG, "Enviado");
-            }
-        });
+                    db.collection("Intentos")
+                            .document(intentoNombre)
+                            .set(mapa)
+                            .addOnSuccessListener(documentReference -> {
+                                Log.d(TAG, "Datos del intento enviados correctamente");
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error al enviar datos del intento", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error al obtener la cantidad de intentos", e);
+                });
     }
 
     private class SuccessMessage {
@@ -386,7 +420,7 @@ public class Habla_Intensidad extends AppCompatActivity {
                             resultsLevel[currentIndex-1][0] = (int) successDuration;
                             resultsLevel[currentIndex-1][1] = ringSize;
                             resultsLevel[currentIndex-1][2] = ringWidth;
-                            sendDataBase(talkIntensityDocument, resultsLevel, 1, POINTS_TO_WIN);
+                            sendDataBase(user.getUid(),talkIntensityDocument, resultsLevel, 1, POINTS_TO_WIN);
                         }else {
                             currentIndex = 0;
                         }

@@ -102,26 +102,6 @@
                 android:textStyle="bold"
                 app:cornerRadius="30dp" />
 
-            <Button
-                android:id="@+id/vowelsButton"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/sizeFrameEscucha"
-                android:layout_marginStart="@dimen/marginExt"
-                android:layout_marginTop="@dimen/marginInt"
-                android:layout_marginEnd="@dimen/marginExt"
-                android:layout_marginBottom="@dimen/marginExt"
-                android:backgroundTint="@color/white"
-                android:drawableRight="@drawable/baseline_pending_24"
-                android:drawableTint="@color/dark_grey"
-                android:gravity="start"
-                android:paddingStart="40dp"
-                android:paddingTop="14dp"
-                android:text="@string/vocalText"
-                android:textColor="@color/dark_grey"
-                android:textSize="@dimen/sizeTextEscucha"
-                android:textStyle="bold"
-                app:cornerRadius="30dp" />
-
         </LinearLayout>
 
 

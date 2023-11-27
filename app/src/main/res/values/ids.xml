@@ -21,4 +21,5 @@
     <item name="linearLayout" type="id" />
     <item name="star" type="id" />
     <item name="indicador" type="id" />
+    <item name="valuePoints" type="id" />
 </resources>

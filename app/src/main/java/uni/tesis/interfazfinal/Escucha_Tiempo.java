@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.icu.util.Calendar;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -13,6 +14,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+import java.util.Locale;
+
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,8 +25,11 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +43,7 @@ public class Escucha_Tiempo extends AppCompatActivity {
     private String TAG = "TAG";
 
     private final String USERS_COLLECTION = "User";
-    private final String HEAR_COLLECTION = "HEAR";
+    private  final String EJERCICIOS_COLLECTION="Ejercicios";
     private final String TALK_COLLECTION = "TALK";
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -64,6 +70,9 @@ public class Escucha_Tiempo extends AppCompatActivity {
     private int freqTone = 300;
     private int numTones = 2;
     private long responseTime;
+    private DocumentReference ejercicioDoc;
+    private DocumentReference userDocRef;
+
 
     private int[][] resultsLevel = new int[POINTS_TO_WIN][2]; // Col0: resultado Col1: tiempoRespuesta
 
@@ -76,8 +85,10 @@ public class Escucha_Tiempo extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
-        hearCollection = db.collection(USERS_COLLECTION).document(user.getEmail()).collection(HEAR_COLLECTION);
-        hearTimeDocument = hearCollection.document("Tiempo");
+        userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+
+        String nombreEjercicio = "Ejercicio_" + level;
+         ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
 
         Log.d(TAG, "user " + user.getDisplayName() + "\nID " + user.getUid());
 
@@ -247,6 +258,10 @@ public class Escucha_Tiempo extends AppCompatActivity {
             timeBetweenTones = minSeparation;
         }
     }
+    private void addPoints(int points, int level) {
+        Log.d("Points", "Adding points: " + points + " for level: " + level);
+        ((Points) getApplication()).addPoints(points, level);
+    }
     private void checkAnswer(int selected) {
         /*
         if (!isReady || isPlaying) {
@@ -265,9 +280,10 @@ public class Escucha_Tiempo extends AppCompatActivity {
 
         if (currentIndex+1 == POINTS_TO_WIN) {
             currentIndex = 0;
-            sendDataBase(hearTimeDocument, resultsLevel, level, POINTS_TO_WIN);
+            sendDataBase(user.getUid(),hearTimeDocument, resultsLevel, level, POINTS_TO_WIN);
             if (points == POINTS_TO_WIN){
                 // Pasa de nivel
+                addPoints(POINTS_TO_WIN, level);
                 level++;
                 points = 0;
                 enableTones = false;
@@ -328,11 +344,14 @@ public class Escucha_Tiempo extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
-    private void sendDataBase(DocumentReference doc, int[][] matrix, int level, int pointsWIN){
-        String userId = user.getUid();  // ID del usuario
+    private DocumentReference getEjercicioDocument(int level) {
+        String nombreEjercicio = "Ejercicio_" + level;
+        return db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
+    }
+    private void sendDataBase(String userId, DocumentReference userdoc, int[][] matrix, int level, int pointsWIN){
+        DocumentReference ejercicioDoc = getEjercicioDocument(level);
         Map<String, Object> mapa = new HashMap<>();
-        String ejercicioId = "Ejercicio_" + level;
+
         // String tmp1, tmp2;
         List<Integer> tiemposRespuesta = new ArrayList<>();
         List<String> resultado = new ArrayList<>();
@@ -346,13 +365,39 @@ public class Escucha_Tiempo extends AppCompatActivity {
 
         mapa.put("Result Level " + level, resultado);
         mapa.put("Time Level " + level, tiemposRespuesta);
+        mapa.put("Ejercicio",ejercicioDoc);
+        DocumentReference userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+        mapa.put("User",userDocRef);
+        Date fechaActual = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String fechaHora = dateFormat.format(fechaActual);
+        mapa.put("fecha",fechaHora);
+        // Agrega el nuevo intento a la colección "Intentos"
+        db.collection("Intentos")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int numIntentos = queryDocumentSnapshots.size();
+                    String intentoNombre = "Intento_" + (numIntentos + 1);
 
-        doc.set(mapa, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    db.collection("Intentos")
+                            .document(intentoNombre)
+                            .set(mapa)
+                            .addOnSuccessListener(documentReference -> {
+                                Log.d(TAG, "Datos del intento enviados correctamente");
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error al enviar datos del intento", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error al obtener la cantidad de intentos", e);
+                });
+        /*doc.set(mapa, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 Log.d(TAG, "Enviado");
             }
-        });
+        });*/
     }
 
 }

@@ -14,7 +14,7 @@ public class Ready_Tono extends AppCompatActivity {
         setContentView(R.layout.activity_ready_tono);
         ok=findViewById(R.id.ok);
         ok.setOnClickListener(view -> {
-            Intent goTime = new Intent(this,tono.class);
+            Intent goTime = new Intent(this,admin_tono.class);
             startActivity(goTime);
         });
 

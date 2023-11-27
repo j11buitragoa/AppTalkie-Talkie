@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.media.tv.TvContract;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -20,11 +22,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
+    private Points myApp;
+    private TextView valuePoints;
 
     private String TAG = "TAG";
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    private final String USERS_COLLECTION = "Usuarios";
+    private final String USERS_COLLECTION = "User";
 
     private Button escuchaButton, hablaButton, vibrometriaButton, addButton;
     private TextView nameTittle;
@@ -33,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        myApp=(Points)getApplication();
+        valuePoints=findViewById(R.id.valuePoints);
+        updatePointsTextView();
 
         escuchaButton = findViewById(R.id.sensButton);
         hablaButton = findViewById(R.id.talkButton);
@@ -42,7 +49,14 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
+        ImageView logout=findViewById(R.id.logout);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Llamada a la función de log out
+                logout();
+            }
+        });
         if(mAuth.getCurrentUser().getEmail().equals("admin@app.com")){
         }
 
@@ -69,6 +83,18 @@ public class MainActivity extends AppCompatActivity {
             startActivity(goAdd);
         });
 
+    }
+    private void logout() {
+        mAuth.signOut();
+
+        Intent intent = new Intent(MainActivity.this, Login.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish(); // Cierra la actividad actual
+    }
+    public void updatePointsTextView() {
+        // Actualizar el contenido del TextView con la puntuación total
+        valuePoints.setText(myApp.getTotalPointsAsString());
     }
 
 

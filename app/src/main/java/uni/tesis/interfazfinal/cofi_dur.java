@@ -190,12 +190,11 @@ public class cofi_dur extends AppCompatActivity {
         });
     }
     void validarCampos() {
-        String selectedItem = spinnerd.getSelectedItem().toString();
         String sostenidoValue = ingresarTiempoEditText.getText().toString();
         String vecesValue = Cuantos.getText().toString();
         String tsilencioValue = ingresarTiempoSilencio.getText().toString();
 
-        boolean camposLlenos = !selectedItem.isEmpty() &&
+        boolean camposLlenos =
                 !sostenidoValue.trim().isEmpty() &&
                 !vecesValue.trim().isEmpty() &&
                 !tsilencioValue.trim().isEmpty();

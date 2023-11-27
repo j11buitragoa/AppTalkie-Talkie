@@ -8,6 +8,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.icu.text.DateFormat;
+import android.icu.text.SimpleDateFormat;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -34,11 +36,17 @@ import com.google.firebase.firestore.SetOptions;
 
 import org.jtransforms.fft.DoubleFFT_1D;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class duracion extends AppCompatActivity {
     private boolean isDetectionEnabled = false;
+    private List<Long> tiemposPorRepeticion = new ArrayList<>();
 
     private static int MIC_PERMISSION_CODE = 200;
     private String TAG = "Hola";
@@ -79,6 +87,7 @@ public class duracion extends AppCompatActivity {
     private int fallos = 0;
     private int intentos = 0;
     private long tiempoTotalEjercicio = 0;
+    private long tiempoTotalEjercicioSeconds = 0;
     private long tiempoRespuesta = 0;
     private long tiempoFin = 0;
     private int silencioProgress = 0;
@@ -87,11 +96,17 @@ public class duracion extends AppCompatActivity {
     private int numeroIntentos = 0;
 
     private ImageView home;
-    private final String USERS_COLLECTION = "Usuarios";
+    private long startTime;
+    private final String USERS_COLLECTION = "User";
+    private final String EJERCICIOS_COLLECTION="Ejercicios";
+    private DocumentReference ejercicioDoc;
+    private DocumentReference userDocRef;
+    private int level;
     private final String TALK_COLLECTION = "TALK";
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private FirebaseUser user;
+    private long tiempoInicioDeteccionVocal = 0;
     private CollectionReference talkCollection;
     private DocumentReference talkdurDocument;
 
@@ -111,8 +126,11 @@ public class duracion extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
-        talkCollection = db.collection(USERS_COLLECTION).document(user.getEmail()).collection(TALK_COLLECTION);
-        talkdurDocument = talkCollection.document("Duracion ");
+        userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+
+        String nombreEjercicio = "Ejercicio_" + 13;
+        ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
+
 
         silenceImg = findViewById(R.id.silenceImg);
         intRecordSampleRate = 16000; // Ajusta la frecuencia de muestreo según tus necesidades
@@ -248,16 +266,17 @@ public class duracion extends AppCompatActivity {
         audioTrack.play();
 
         long startTime = System.currentTimeMillis();
-        long tiempoInactividad = 0;
-        boolean abandonado = false;
         long durationInMilliseconds = getDurationFromEditText();
         int numRepetitions = getNumRepetitionsFromEditText(); // Número de repeticiones
         long silenceDuration = getSilenceDurationFromEditText(); // Duración del silencio en segundos
 
         for (int repetition = 0; repetition < numRepetitions && isActive; repetition++) {
-            Log.d("AudioThread", "silenceDuration0: " + silenceDuration);
-            long tiempoRespuesta = 0;
+            //Log.d("AudioThread", "silenceDuration0: " + silenceDuration);
+            Log.d("TiempoRepetición", "Iniciando la primera repetición");
+            long tiempoRepeticionActual = System.currentTimeMillis() - startTime;
+            Log.d("TiempoRepetición", "Tiempo de repetición actual: " + tiempoRepeticionActual);
 
+            tiemposPorRepeticion.add(tiempoRepeticionActual);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -284,7 +303,7 @@ public class duracion extends AppCompatActivity {
                 if (detectedVowel) {
 
                     long currentTime = System.currentTimeMillis();
-                    tiempoRespuesta = currentTime - startTime;
+
                     long elapsedTime = currentTime - startTime;
                     int progress = (int) (100 * elapsedTime / durationInMilliseconds);
                     if (progress >= 0 && progress <= 100) {
@@ -293,10 +312,7 @@ public class duracion extends AppCompatActivity {
                         if (progress >= 80 && !is80PercentReached) {
                             puntos1++;
                             aciertos++;
-                            if (tiempoRespuesta > durationInMilliseconds) {
-                                abandonado = true;
-                                break;
-                            }
+
                             is80PercentReached = true;
                             Log.d("Puntos", "" + puntos1);
                             runOnUiThread(new Runnable() {
@@ -316,7 +332,7 @@ public class duracion extends AppCompatActivity {
             }
 
             performFFT(micData);
-            Log.d("AudioThread", "silenceDuration0: " + silenceDuration);
+            //Log.d("AudioThread", "silenceDuration0: " + silenceDuration);
             silenceDuration = getSilenceDurationFromEditText();
             startTime = System.currentTimeMillis();
             silencioBar.setMax((int) silenceDuration);
@@ -328,9 +344,10 @@ public class duracion extends AppCompatActivity {
                 double energy = calculateEnergy(micData);
                 short sampleValue = micData[0]; // Escoge un índice para visualizar su valor
 
-                Log.d("Prueba", "Valor de micData: " + sampleValue);
+                //Log.d("Prueba", "Valor de micData: " + sampleValue);
 
-                Log.d("Prueba", "Silencio." + energy);
+
+                //Log.d("Prueba", "Silencio." + energy);
                 if (energy < energyThreshold2) {
                     silencioProgress++;
                     int currentProgress = (int) (System.currentTimeMillis() - startTime);
@@ -363,34 +380,66 @@ public class duracion extends AppCompatActivity {
             });
 
         }
-
-        tiempoFin = System.currentTimeMillis();
-        tiempoTotalEjercicio = (tiempoFin - startTime) * 1000;
-        if (abandonado) {
-            tiempoInactividad = tiempoTotalEjercicio - tiempoRespuesta;
+        tiempoTotalEjercicio = 0;
+        for (Long tiempoRepeticion : tiemposPorRepeticion) {
+            tiempoTotalEjercicio += tiempoRepeticion;
         }
+
+// Calcular el tiempo total en segundos
+        tiempoTotalEjercicioSeconds = tiempoTotalEjercicio ;
+
+        Log.d("TiempoTotal", "Tiempo total del ejercicio en segundos: " + tiempoTotalEjercicioSeconds);
+        sendDataBase(userDocRef,level);
         isActive = false;
         audioRecord.stop();
         audioTrack.stop();
-        sendDataBase(talkdurDocument);
 
 
 
     }
 
-    private void sendDataBase(DocumentReference doc){
+    private DocumentReference getEjercicioDocument(int level) {
+        String nombreEjercicio = "Ejercicio_" + 13;
+        return db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
+    }
+    private void sendDataBase( DocumentReference userdoc,int level){
+        DocumentReference ejercicioDoc = getEjercicioDocument(level);
 
         Map<String, Object> datosUsuario = new HashMap<>();
         datosUsuario.put("Tiempo de silencio", getSilenceDurationFromEditText());
         datosUsuario.put("Tiempo sostenido", getDurationFromEditText());
         datosUsuario.put("Número de veces", getNumRepetitionsFromEditText());
         datosUsuario.put("Aciertos", aciertos);
+        datosUsuario.put("Ejercicio",ejercicioDoc);
         datosUsuario.put("Tiempo total ejercicio", tiempoTotalEjercicio);
-        datosUsuario.put("Tiempo de respuesta", tiempoRespuesta);
-        datosUsuario.put("Número de intentos", numeroIntentos);
-        datosUsuario.put("Tiempo de inactividad", tiempoInactividad);
+        //datosUsuario.put("Tiempo de respuesta", tiempoRespuesta);
+        DocumentReference userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+        datosUsuario.put("User",userDocRef);
+        Date fechaActual = Calendar.getInstance().getTime();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String fechaHora = dateFormat.format(fechaActual);
+        datosUsuario.put("fecha",fechaHora);
+        // Agrega el nuevo intento a la colección "Intentos"
+        db.collection("Intentos")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    int numIntentos = queryDocumentSnapshots.size();
+                    String intentoNombre = "Intento_" + (numIntentos + 1);
 
-        doc.set(datosUsuario, SetOptions.merge()).addOnSuccessListener(unused -> Log.d(TAG, "Enviado"));
+                    db.collection("Intentos")
+                            .document(intentoNombre)
+                            .set(datosUsuario)
+                            .addOnSuccessListener(documentReference -> {
+                                Log.d(TAG, "Datos del intento enviados correctamente");
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Error al enviar datos del intento", e);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error al obtener la cantidad de intentos", e);
+                });
+
     }
 
     private double calculateEnergy(short[] audioData) {
