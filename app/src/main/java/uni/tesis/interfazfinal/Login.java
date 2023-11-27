@@ -12,8 +12,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,7 +40,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Login extends AppCompatActivity {
@@ -46,7 +55,10 @@ public class Login extends AppCompatActivity {
     private final String USERS_COLLECTION = "User";
     private final String AGE = "Edad";
     private final String NAME = "Nombre";
-    private final String USERNAME = "Username";
+    private final String TYPE_DEV = "tipo de dispositivo";
+    private final String ADMIN = "es admin";
+    private final String SEXO = "sexo";
+    private String selectSexo, selectDevice;
 
     private Button loginButtonReg, loginButton;
     private EditText username, password;
@@ -64,20 +76,11 @@ public class Login extends AppCompatActivity {
         loginButtonReg = findViewById(R.id.loginButtonReg);
         loginButton = findViewById(R.id.loginButtonLog);
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                loginUser();
-                // Log.d(TAG, "user " + mAuth.getCurrentUser().getDisplayName() + "\nID " + mAuth.getCurrentUser().getUid());
-            }
+        loginButton.setOnClickListener(view -> {
+            loginUser();
         });
 
-        loginButtonReg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showRegisterDialog();
-            }
-        });
+        loginButtonReg.setOnClickListener(v -> showRegisterDialog());
     }
 
     private void loginUser(){
@@ -102,30 +105,150 @@ public class Login extends AppCompatActivity {
         });
     }
     private void showRegisterDialog(){
-        AlertDialog.Builder builder=new AlertDialog.Builder(this, R.style.CustomAlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.customAlertDialogTalkie);
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.registro,null);
-        dialogView.setBackgroundColor(getResources().getColor(R.color.white));
         dialogView.setBackgroundResource(R.drawable.rounded_white_background);
 
         builder.setView(dialogView);
 
         EditText usuarioN, contraseñaN, edadN, nameN;
+        Switch adminSW;
+        Spinner spinnerSexo, spinnerDevice;
+        Button buttonCancel, buttonRegister;
+
 
         usuarioN = dialogView.findViewById(R.id.usuarioN);
         contraseñaN = dialogView.findViewById(R.id.contraseñaN);
         edadN = dialogView.findViewById(R.id.edadN);
         nameN = dialogView.findViewById(R.id.nameN);
+        spinnerSexo = dialogView.findViewById(R.id.spinnerSexo);
+        spinnerDevice = dialogView.findViewById(R.id.spinnerDevice);
+        adminSW = dialogView.findViewById(R.id.switchAdmin);
+        buttonRegister = dialogView.findViewById(R.id.buttonRegister);
+        buttonCancel = dialogView.findViewById(R.id.buttonCancel);
 
+        String[] devices = new String[]{
+                "Dispositivo",
+                "Auriculares",
+                "Implante",
+                "Ninguno"
+        };
+        String[] sexo = new String[]{
+                "Sexo",
+                "Femenino",
+                "Masculino"
+        };
 
-        builder.setPositiveButton("Registrar", new DialogInterface.OnClickListener() {
+        final List<String> devicesList = new ArrayList<>(Arrays.asList(devices));
+        final List<String> sexoList = new ArrayList<>(Arrays.asList(sexo));
+
+        final ArrayAdapter<String> adapterDevice = new ArrayAdapter<String>(this,R.layout.spinner_item,devicesList){
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public boolean isEnabled(int position){
+                if(position == 0)
+                {
+                    // Disable the first item from Spinner
+                    // First item will be use for hint
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if(position == 0){
+                    // Set the hint text color gray
+                    tv.setTextColor(Color.GRAY);
+                }
+                else {
+                    tv.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
+        adapterDevice.setDropDownViewResource(R.layout.spinner_item);
+        spinnerDevice.setAdapter(adapterDevice);
 
-                FirebaseUser user = mAuth.getCurrentUser();
+        final ArrayAdapter<String> adapterSexo = new ArrayAdapter<String>(this,R.layout.spinner_item,sexoList){
+            @Override
+            public boolean isEnabled(int position){
+                if(position == 0)
+                {
+                    // Disable the first item from Spinner
+                    // First item will be use for hint
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if(position == 0){
+                    // Set the hint text color gray
+                    tv.setTextColor(Color.GRAY);
+                }
+                else {
+                    tv.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
+        adapterSexo.setDropDownViewResource(R.layout.spinner_item);
+        spinnerSexo.setAdapter(adapterSexo);
 
-                String usuario = usuarioN.getText().toString().trim();
-                String contraseña = contraseñaN.getText().toString().trim();
+        spinnerDevice.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    //Toast.makeText(Login.this, "Por favor, seleccione una opción", Toast.LENGTH_SHORT).show();
+                }else {
+                    selectDevice = parent.getItemAtPosition(position).toString();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        spinnerSexo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0){
+                    //Toast.makeText(Login.this, "Por favor, seleccione una opción", Toast.LENGTH_SHORT).show();
+                }else {
+                    selectSexo = parent.getItemAtPosition(position).toString();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+
+        // Muestra el diálogo
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        buttonRegister.setOnClickListener(v -> {
+
+            if (selectSexo == null){
+                Toast.makeText(Login.this, "Selecciona un sexo", Toast.LENGTH_SHORT).show();
+            }else if (selectDevice == null) {
+                Toast.makeText(Login.this, "Selecciona un dispositivo", Toast.LENGTH_SHORT).show();
+            }else {
+                String usuario = usuarioN.getText().toString().toLowerCase();
+                String contraseña = contraseñaN.getText().toString();
                 String edad = edadN.getText().toString();
                 String nombre = nameN.getText().toString();
 
@@ -136,104 +259,46 @@ public class Login extends AppCompatActivity {
                 if (contraseña.length() < 6) {
                     Toast.makeText(Login.this, "Ingrese una contraseña válida (al menos 6 caracteres)", Toast.LENGTH_SHORT).show();
                     return;
-
                 }
-                // Using Database
-                /*
-                DatabaseReference usuariosRef = FirebaseDatabase.getInstance().getReference("usuarios");
-
-                usuariosRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()){
-                            Toast.makeText(Login.this, "El usuario ya está registrado.Inicie sesión", Toast.LENGTH_SHORT).show();
-                            dialog.cancel();
-                        }else{
-                            mAuth.createUserWithEmailAndPassword(userId+"@app.com",contraseña).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("usuarios");
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        String userId = user.getUid();
-                                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                                .setDisplayName(nombre).build();
-                                        user.updateProfile(profileUpdates);
-                                        databaseReference.child(userId).child("edad").setValue(edad);
-                                        Toast.makeText(Login.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
-                                    }else {
-                                        // Fallo en el registro
-                                        Toast.makeText(Login.this, "El usuario ya existe. Inicie sesion o digite otro usuario ", Toast.LENGTH_SHORT).show();
-                                    }
-
-                                }
-                            });
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
-                 */
 
                 // Agrega info del usuario
                 Map<String, Object> userInfo = new HashMap<>();
                 userInfo.put(NAME, nombre);
                 userInfo.put(AGE, edad);
-                userInfo.put(USERNAME,usuario);
+                userInfo.put(SEXO,selectSexo);
+                userInfo.put(TYPE_DEV, selectDevice);
+                userInfo.put(ADMIN,adminSW.isChecked());
 
                 String mail = usuario + "@app.com";
 
                 db.collection(USERS_COLLECTION).document(mail).get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                          @Override
-                          public void onSuccess(DocumentSnapshot documentSnapshot) {
-                              if (documentSnapshot.exists()){
-                                  Toast.makeText(Login.this, "El usuario ya está registrado.Inicie sesión", Toast.LENGTH_SHORT).show();
-                                  dialog.cancel();
-                              }else {
-                                  mAuth.createUserWithEmailAndPassword(mail,contraseña).addOnCompleteListener(task -> {
-                                      if (task.isSuccessful()) {
-                                          UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                                  .setDisplayName(nombre).build();
-                                          user.updateProfile(profileUpdates);
-                                          db.collection(USERS_COLLECTION).document(mail).set(userInfo);
-                                          Toast.makeText(Login.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
-                                      }else {
-                                          // Fallo en el registro
-                                          Toast.makeText(Login.this, "El usuario ya existe. Inicie sesion o digite otro usuario ", Toast.LENGTH_SHORT).show();
-                                      }
-                                  });
-                              }
-                          }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()){
+                                Toast.makeText(Login.this, "El usuario ya está registrado.Inicie sesión", Toast.LENGTH_SHORT).show();
+                                dialog.cancel();
+                            }else {
+                                mAuth.createUserWithEmailAndPassword(mail,contraseña).addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        db.collection(USERS_COLLECTION).document(mail).set(userInfo);
+                                        Toast.makeText(Login.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
+                                        dialog.cancel();
+                                    }else {
+                                        // Fallo en el registro
+                                        Toast.makeText(Login.this, "El usuario ya existe. Inicie sesion o digite otro usuario ", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        })
+                        .addOnFailureListener(e -> {
 
-                        }
-                    });
+                        });
             }
-        });
-        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel(); // Cierra el diálogo
-            }
+
         });
 
-        // Muestra el diálogo
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-        positiveButton.setTextColor(Color.WHITE);
-        positiveButton.setBackgroundResource(R.drawable.custom_edittext);
-        negativeButton.setTextColor(Color.WHITE);
-        negativeButton.setBackgroundResource(R.drawable.custom_edittext);
+        buttonCancel.setOnClickListener(v -> {
+            dialog.cancel();
+        });
 
     }
 }

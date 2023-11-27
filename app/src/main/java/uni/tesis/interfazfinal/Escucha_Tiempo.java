@@ -111,8 +111,6 @@ public class Escucha_Tiempo extends AppCompatActivity {
             Intent goEscuchaMenu = new Intent(Escucha_Tiempo.this, Escucha_Frame.class);
             startActivity(goEscuchaMenu);
         });
-
-
     }
     private void startGame() {
         points = 0;
