@@ -11,183 +11,179 @@
 
 
     <androidx.cardview.widget.CardView
-        android:layout_width="345dp"
-        android:layout_height="642dp"
-        android:layout_centerInParent="true"
-        android:layout_margin="-500dp"
-        android:layout_marginBottom="1dp"
-        android:background="@drawable/custom_edittext"
-        android:translationY="-10dp"
-        app:cardCornerRadius="30dp">
+        android:layout_width="340dp"
+        android:layout_height="600dp"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="20dp">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="712dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            tools:layout_editor_absoluteX="35dp"
-            tools:layout_editor_absoluteY="220dp">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/textView9"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:layout_marginBottom="10dp"
-                android:text="Debes hacer que la flecha de dirección de la brújula apunte\n  a la letra que te indica la pantalla.\n \n En este caso podemos ver que \n apunta hacia la vocal 'o' "
-                android:textAlignment="center"
-                android:textColor="@color/blue"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/imageView79"
-                android:layout_width="166dp"
-                android:layout_height="84dp"
-                android:layout_marginBottom="10dp"
-                app:srcCompat="@drawable/img_5" />
-
-            <LinearLayout
-                android:layout_width="380dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                tools:layout_editor_absoluteX="35dp">
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="-160dp"
-                    android:layout_marginEnd="170dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_weight="1"
-                    android:text="Debes empezar a hablar \n cuando uno de los \n  altavoces empiece a vibrar "
-                    android:textAlignment="center"
-                    android:textColor="@color/blue"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/textView4"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="-500dp"
-                    android:layout_marginEnd="-170dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_weight="1"
-                    android:text="Mientras tanto en el otro \n altavoz sentiras el \n las vibraciones  de tu voz "
-                    android:textAlignment="center"
-                    android:textColor="@color/blue"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="357dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                tools:layout_editor_absoluteX="35dp">
-
-
-                <ImageView
-                    android:id="@+id/imageView7"
-                    android:layout_width="181dp"
-                    android:layout_height="90dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginEnd="150dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_weight="1"
-                    android:padding="8dp"
-                    app:srcCompat="@drawable/img_3" />
-
-                <ImageView
-                    android:id="@+id/imageView8"
-                    android:layout_width="179dp"
-                    android:layout_height="90dp"
-                    android:layout_marginStart="-150dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_weight="1"
-                    android:padding="8dp"
-                    app:srcCompat="@drawable/img_3" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/textView11"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:text="Si te aparece esta imagen, signfica que debes permanecer en silencio \n hasta que el tiempo se complete  "
-                android:textAlignment="center"
-                android:textColor="@color/blue"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/imageView88"
-                android:layout_width="116dp"
-                android:layout_height="95dp"
-                android:layout_marginBottom="20dp"
-                app:srcCompat="@drawable/silenciop" />
-
-            <TextView
-                android:id="@+id/textView12"
-                android:layout_width="292dp"
-                android:layout_height="wrap_content"
-                android:text="Cuando se vaya la imagen de silencio \n sigue el ejercicio \n Completa varias veces para ganar estrellas  "
-                android:textAlignment="center"
-                android:textColor="@color/blue"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/imageView888"
-                android:layout_width="105dp"
-                android:layout_height="76dp"
-                android:layout_marginBottom="20dp"
-                app:srcCompat="@drawable/star2" />
-
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="376dp"
-            android:layout_height="110dp"
-            android:background="@drawable/custom_edittext"
-            android:translationY="10dp"
-            app:cardCornerRadius="30dp"
-            android:layout_centerInParent="true"
-            app:cardElevation="10dp">
-
-            <LinearLayout
-                android:layout_width="376dp"
-                android:layout_height="110dp"
                 android:gravity="center"
                 android:orientation="vertical"
-                tools:layout_editor_absoluteX="35dp"
-                tools:layout_editor_absoluteY="208dp">
+                android:padding="5dp">
+
+                <TextView
+                    android:id="@+id/textView9"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="30dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Debes hacer que la flecha de dirección de la brújula apunte a la letra que te indica la pantalla.En este caso podemos ver que apunta hacia la vocal 'o'"
+                    android:textAlignment="center"
+                    android:textColor="@color/blue"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/imageView79"
+                    android:layout_width="match_parent"
+                    android:layout_height="170dp"
+                    android:layout_marginBottom="20dp"
+                    app:srcCompat="@drawable/img_5" />
+
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="30dp"
+                    android:stretchColumns="*">
+
+                    <TableRow
+                        android:id="@+id/row1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/textView3"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="20dp"
+                            android:text="Debes empezar a hablar cuando uno de los altavoces empiece a vibrar"
+                            android:textAlignment="center"
+                            android:textColor="@color/blue"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/textView4"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="20dp"
+                            android:text="Mientras tanto en el otro altavoz sentiras las vibraciones de tu voz"
+                            android:textAlignment="center"
+                            android:textColor="@color/blue"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/row2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:id="@+id/imageView7"
+                            android:layout_width="178dp"
+                            android:layout_height="100dp"
+                            android:layout_weight="1"
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/img_3" />
+
+                        <ImageView
+                            android:id="@+id/imageView8"
+                            android:layout_width="178dp"
+                            android:layout_height="100dp"
+                            android:layout_weight="1"
+                            android:padding="8dp"
+                            app:srcCompat="@drawable/img_3" />
+
+                    </TableRow>
+
+                </TableLayout>
+
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:paddingHorizontal="30dp"
+                    android:text="Si te aparece esta imagen, signfica que debes permanecer en silencio hasta que el tiempo se complete"
+                    android:textAlignment="center"
+                    android:textColor="@color/blue"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/imageView88"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_marginBottom="30dp"
+                    app:srcCompat="@drawable/silenciop" />
+
+                <TextView
+                    android:id="@+id/textView12"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="30dp"
+                    android:text="Cuando se vaya la imagen de silencio sigue el ejercicio"
+                    android:textAlignment="center"
+                    android:textColor="@color/blue"
+                    android:layout_marginBottom="15dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView13"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="30dp"
+                    android:text="Completa varias veces para ganar estrellas"
+                    android:textAlignment="center"
+                    android:textColor="@color/blue"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/imageView888"
+                    android:layout_width="105dp"
+                    android:layout_height="76dp"
+                    android:layout_marginBottom="30dp"
+                    app:srcCompat="@drawable/star2" />
 
                 <Button
-                    android:id="@+id/ok"
-                    android:layout_width="321dp"
-                    android:layout_height="68dp"
-                    android:layout_centerInParent="true"
-                    android:layout_marginBottom="5dp"
+                    android:id="@+id/okButton"
+                    android:layout_width="276dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
                     android:backgroundTint="@color/blue"
                     android:text="OK"
-                    android:textAlignment="center"
-                    android:textSize="18sp"
-                    app:cornerRadius="20dp"
-                    tools:layout_editor_absoluteX="67dp"
-                    tools:layout_editor_absoluteY="1dp" />
+                    android:textSize="25sp"
+                    app:cornerRadius="20dp"/>
+
+                <Button
+                    android:id="@+id/adminButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="30dp"
+                    android:backgroundTint="@color/dark_grey"
+                    android:text="Admin"
+                    android:textSize="15sp"
+                    app:cornerRadius="10dp"/>
+
+
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </ScrollView>
+
+    </androidx.cardview.widget.CardView>
 
     </LinearLayout>

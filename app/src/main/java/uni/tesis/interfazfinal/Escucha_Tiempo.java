@@ -72,6 +72,7 @@ public class Escucha_Tiempo extends AppCompatActivity {
     private long responseTime;
     private DocumentReference ejercicioDoc;
     private DocumentReference userDocRef;
+    private Points myApp;
 
 
     private int[][] resultsLevel = new int[POINTS_TO_WIN][2]; // Col0: resultado Col1: tiempoRespuesta
@@ -91,6 +92,8 @@ public class Escucha_Tiempo extends AppCompatActivity {
          ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
 
         Log.d(TAG, "user " + user.getDisplayName() + "\nID " + user.getUid());
+        myApp = (Points) getApplication();
+        myApp.updateMainActivityUI();
 
         Intent intent = getIntent();
         ArrayList<String> nivel1 = intent.getStringArrayListExtra("Nivel 1");
@@ -272,7 +275,8 @@ public class Escucha_Tiempo extends AppCompatActivity {
     }
     private void addPoints(int points, int level) {
         Log.d("Points", "Adding points: " + points + " for level: " + level);
-        ((Points) getApplication()).addPoints(points, level);
+        String sectionName = "Escucha_Tiempo";
+        ((Points) getApplication()).addPoints(sectionName, points);
     }
     private void checkAnswer(int selected) {
         /*
@@ -412,4 +416,20 @@ public class Escucha_Tiempo extends AppCompatActivity {
         });*/
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myApp.removeMainActivity("Escucha_Tiempo");
+    }
 }

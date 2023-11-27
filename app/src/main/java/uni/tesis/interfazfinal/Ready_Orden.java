@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import java.util.List;
 public class Ready_Orden extends AppCompatActivity {
     Button okButton, adminButton;
     String selectLevel;
+    Intent goOrden;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,10 +32,10 @@ public class Ready_Orden extends AppCompatActivity {
 
         okButton = findViewById(R.id.okButton);
         adminButton = findViewById(R.id.adminButton);
+        goOrden = new Intent(this,Escucha_Orden.class);
 
         okButton.setOnClickListener(view -> {
-            Intent goTime = new Intent(this,Escucha_Orden.class);
-            startActivity(goTime);
+            startActivity(goOrden);
         });
 
         adminButton.setOnClickListener(v -> {
@@ -51,7 +53,7 @@ public class Ready_Orden extends AppCompatActivity {
 
         Spinner spinnerLevel;
         Button saveButton, cancelButton;
-        EditText editDuracion,editIntentos;
+        EditText editDuracion,editIntentos, editFreq;
         String[] level = new String[]{
                 "Selecciona un nivel",
                 "Nivel 1",
@@ -66,6 +68,7 @@ public class Ready_Orden extends AppCompatActivity {
 
         spinnerLevel = dialogView.findViewById(R.id.spinnerLevel);
         editDuracion = dialogView.findViewById(R.id.editDuracion);
+        editFreq = dialogView.findViewById(R.id.editFreq);
         editIntentos = dialogView.findViewById(R.id.editIntentos);
         saveButton = dialogView.findViewById(R.id.saveButton);
         cancelButton = dialogView.findViewById(R.id.cancelButton);
@@ -107,6 +110,28 @@ public class Ready_Orden extends AppCompatActivity {
                     //Toast.makeText(Login.this, "Por favor, seleccione una opción", Toast.LENGTH_SHORT).show();
                 }else {
                     selectLevel = parent.getItemAtPosition(position).toString();
+                    switch (selectLevel){
+                        case "Nivel 1":
+                            editDuracion.setText("1000");
+                            editFreq.setText("300");
+                            editIntentos.setText("3");
+                            break;
+                        case "Nivel 2":
+                            editDuracion.setText("500");
+                            editFreq.setText("300");
+                            editIntentos.setText("3");
+                            break;
+                        case "Nivel 3":
+                            editDuracion.setText("200");
+                            editFreq.setText("300");
+                            editIntentos.setText("4");
+                            break;
+                        case "Nivel 4":
+                            editDuracion.setText("100");
+                            editFreq.setText("300");
+                            editIntentos.setText("5");
+                            break;
+                    }
                 }
             }
 
@@ -116,7 +141,16 @@ public class Ready_Orden extends AppCompatActivity {
         });
 
         saveButton.setOnClickListener(v -> {
-
+            if (selectLevel != null){
+                ArrayList<String> datos = new ArrayList<>();
+                datos.add(editDuracion.getText().toString());
+                datos.add(editFreq.getText().toString());
+                datos.add(editIntentos.getText().toString());
+                goOrden.putStringArrayListExtra(selectLevel, datos);
+                Toast.makeText(this, "        " + selectLevel + "\nDatos guardados", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(this, "Selecciona un nivel", Toast.LENGTH_SHORT).show();
+            }
         });
 
         cancelButton.setOnClickListener(v -> {

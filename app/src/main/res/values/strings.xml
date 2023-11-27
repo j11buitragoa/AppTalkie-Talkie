@@ -20,7 +20,7 @@
     <string name="freqText">Frecuencia</string>
     <string name="orderText">Orden</string>
     <string name="vocalText">Vocales</string>
-    <string name="rhythmText">Tiempo</string>
-    <string name="imitarText">Frecuencia</string>
+    <string name="rhythmText">Duración</string>
+    <string name="imitarText">Tono</string>
     <string name="switchName">Admin</string>
 </resources>

@@ -71,21 +71,20 @@ public class Habla_Intensidad extends AppCompatActivity {
     private int circleSizePRE = 0;
 
     private long successStartTime = 0;  // Tiempo en que se alcanzó el objetivo
-    private long successDuration = 1000;
+    private long successDuration = 500;
     private boolean isSuccessful = false;  // Indicador de si se alcanzó el objetivo durante el tiempo especificado
     //private static final long SUCCESS_DURATION = 1000;  // Duración en milisegundos para mostrar el éxito
-
-    private Switch adminModeSwitch;
-    private SeekBar ringSizeSeekBar, ringWidthSeekBar;
-    private EditText inputTime;
 
     private Button backButton;
 
     private boolean isAdminMode = false;
-
+    private boolean bpoints=false;
+    private int puntos;
     private long responseTime;
     private int currentIndex = 0, contDown = 0, contUp = 0;
     private int POINTS_TO_WIN = 10;
+    private int ringSize = 300, ringWidth = 50;
+    private Points points;
     private int[][] resultsLevel = new int[POINTS_TO_WIN][6]; //Col0: successDuration Col1: sizeRing Col2: widthRing Col3:durationIntento Col4: cantUP col5:cantDown
 
     @Override
@@ -101,38 +100,37 @@ public class Habla_Intensidad extends AppCompatActivity {
         String nombreEjercicio = "Ejercicio_" + 12;
         ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
 
+        points = (Points) getApplication();
+        points.updateMainActivityUI();
+
         surfaceView = findViewById(R.id.surfaceView);
         surfaceHolder = surfaceView.getHolder();
         circleDrawer = new CircleDrawer(surfaceHolder);
-
-        adminModeSwitch = findViewById(R.id.switch1);
-        ringSizeSeekBar = findViewById(R.id.seekBarRing1);
-        ringWidthSeekBar = findViewById(R.id.seekBarRing2);
-        inputTime = findViewById(R.id.editText);
         backButton = findViewById(R.id.backButton);
 
         surfaceView.setZOrderMediaOverlay(true);
         SurfaceHolder surfaceHolder = surfaceView.getHolder();
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
 
-        InputFilter noNewlinesFilter = (source, start, end, dest, dstart, dend) -> {
-            // Evita que se ingresen caracteres de nueva línea o retorno de carro
-            for (int i = start; i < end; i++) {
-                if (source.charAt(i) == '\n' || source.charAt(i) == '\r') {
-                    return "";
-                }
-            }
-            return null; // Acepta la entrada tal como es
-        };
-
-        inputTime.setFilters(new InputFilter[]{noNewlinesFilter});
-
         backButton.setOnClickListener(v -> {
             Intent goHablaMenu = new Intent(this, Habla_Frame.class);
             startActivity(goHablaMenu);
         });
 
-        adminMode();
+        Intent intent = getIntent();
+        ArrayList<String> nivel1 = intent.getStringArrayListExtra("Nivel 1");
+
+        if (nivel1 == null){
+            Log.d(TAG, "Dato NULL");
+        }else {
+            successDuration = Long.parseLong(nivel1.get(0));
+            ringSize = Integer.parseInt(nivel1.get(1));
+            ringWidth = Integer.parseInt(nivel1.get(2));
+        }
+
+        circleDrawer.drawRingWithSize(ringSize);
+        circleDrawer.drawRingWithWidth(ringWidth);
+
 
         // Check and request audio permission
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -144,87 +142,20 @@ public class Habla_Intensidad extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         stopAudioCapture();
-    }
-
-    private void adminMode(){
-        // Configurar un listener para el switch del modo administrador
-        adminModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            isAdminMode = isChecked;
-            currentIndex++;
-            ringSizeSeekBar.setEnabled(isAdminMode); // Habilitar/deshabilitar el control deslizante según el modo admin
-            ringWidthSeekBar.setEnabled(isAdminMode);
-        });
-
-        // Configurar un listener para el control deslizante de tamaño del anillo
-        ringSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (isAdminMode) {
-                    // Obtener el valor del control deslizante y ajustar el tamaño del anillo
-                    int ringSize = progress;
-                    circleDrawer.drawRingWithSize(ringSize);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-
-        ringWidthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (isAdminMode) {
-                    // Obtener el valor del control deslizante y ajustar el tamaño del anillo
-                    int ringWidth = progress;
-                    circleDrawer.drawRingWithWidth(ringWidth);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-
-        inputTime.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (isAdminMode) {
-                    String durationText = inputTime.getText().toString();
-                    try {
-                        long newDuration = Long.parseLong(durationText);
-                        successDuration = newDuration;
-                        // Mensaje confirmacion
-                        Toast.makeText(getApplicationContext(), "Duración actualizada: " + newDuration + " ms", Toast.LENGTH_SHORT).show();
-                    } catch (NumberFormatException e) {
-                        // Ingreso de valor no válido
-                        Toast.makeText(getApplicationContext(), "Valor no válido", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
     }
 
     @SuppressLint("MissingPermission")
@@ -402,7 +333,7 @@ public class Habla_Intensidad extends AppCompatActivity {
                     canvas.drawCircle(centerX, centerY, ringSize / 2, ringPaint);
                 }
 
-                if ((circleSize >= (ringSize - ringWidth/2)) &&((circleSize <= (ringSize + ringWidth/2)))) {
+                if ((circleSize >= (ringSize - ringWidth/2)) && ((circleSize <= (ringSize + ringWidth/2)))) {
                     contDown = 0;
                     contUp = 0;
                     if (contDown + contUp == 0)
@@ -413,8 +344,10 @@ public class Habla_Intensidad extends AppCompatActivity {
                         isSuccessful = true;
                     } else if (System.currentTimeMillis() - successStartTime >= successDuration) {
                         // Cumplido, sigiuente nivel
+                        bpoints=true;
                         drawSuccessTextOK(canvas, centerX, centerY);
                         responseTime = System.currentTimeMillis() - responseTime;
+
 
                         if (currentIndex>0 && currentIndex<=POINTS_TO_WIN){
                             resultsLevel[currentIndex-1][0] = (int) successDuration;
@@ -430,6 +363,12 @@ public class Habla_Intensidad extends AppCompatActivity {
                     drawSuccessTextDOWN(canvas, centerX, centerY);
                     contDown++;
                     isSuccessful = false;
+                    isSuccessful = false;
+                    if(bpoints){
+                        puntos++;
+                        bpoints=false;
+                        addPoints(puntos);
+                    }
                 }else {
                     // arriba
                     contUp++;
@@ -439,6 +378,11 @@ public class Habla_Intensidad extends AppCompatActivity {
 
                 surfaceHolder.unlockCanvasAndPost(canvas);
             }
+        }
+
+        private void addPoints(int points) {
+            String sectionName = "Escucha_Intensidad";
+            ((Points) getApplication()).addPoints(sectionName, points);
         }
 
         private void drawSuccessTextOK(Canvas canvas, int centerX, int centerY) {
@@ -465,4 +409,6 @@ public class Habla_Intensidad extends AppCompatActivity {
             canvas.drawText("DOWN", centerX, centerY, textPaint);
         }
     }
+
+
 }

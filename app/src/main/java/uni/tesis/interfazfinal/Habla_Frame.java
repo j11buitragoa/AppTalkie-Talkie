@@ -19,6 +19,7 @@ public class Habla_Frame extends AppCompatActivity {
         backButton = findViewById(R.id.backButton);
         HfrecuenciaButton=findViewById(R.id.HfrecuenciaButton);
         HtiempoButton=findViewById(R.id.HtiempoButton);
+
         talkIntensity.setOnClickListener(view -> {
             Intent goIntensity = new Intent(this,Ready_Int.class);
             startActivity(goIntensity);
@@ -37,7 +38,6 @@ public class Habla_Frame extends AppCompatActivity {
         HfrecuenciaButton.setOnClickListener(v -> {
             Intent tono =new Intent(this,Ready_Tono.class);
             startActivity(tono);
-
         });
 
     }

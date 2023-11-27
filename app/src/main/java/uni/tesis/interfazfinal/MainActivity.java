@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -40,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         myApp=(Points)getApplication();
         valuePoints=findViewById(R.id.valuePoints);
-        updatePointsTextView();
+        myApp.addMainActivity("MainActivity",this);
+        updatePointsTextView(myApp.getTotalPoints());
 
         escuchaButton = findViewById(R.id.sensButton);
         hablaButton = findViewById(R.id.talkButton);
@@ -53,10 +55,21 @@ public class MainActivity extends AppCompatActivity {
         DocumentReference docUsers = db.collection(USERS_COLLECTION).document(mAuth.getCurrentUser().getEmail());
 
         ImageView logout=findViewById(R.id.logout);
+        ImageView confiInt=findViewById(R.id.confiInt);
+        ImageView escucInt=findViewById(R.id.escucInt);
+        ImageView hablaInt=findViewById(R.id.hablaInt);
+
         logout.setOnClickListener(view -> {
             // Llamada a la función de log out
             logout();
         });
+
+        confiInt.setOnClickListener(v ->
+                Toast.makeText(getApplicationContext(), "Esta sección te permitirá familiarizarte mejor las vibraciones de los altavoces ", Toast.LENGTH_SHORT).show());
+        escucInt.setOnClickListener(v ->
+                Toast.makeText(getApplicationContext(), "Esta sección te permitirá hacer un entrenamiento de la percepción de las vibraciones con los altavoces ", Toast.LENGTH_LONG).show());
+        hablaInt.setOnClickListener(v ->
+                Toast.makeText(getApplicationContext(), "Esta sección te permitirá entrenar el habla ", Toast.LENGTH_SHORT).show());
 
         if(mAuth.getCurrentUser().getEmail().equals("admin@app.com")){
         }
@@ -85,6 +98,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myApp.removeMainActivity("MainActivity");
+    }
     private void logout() {
         mAuth.signOut();
 
@@ -93,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish(); // Cierra la actividad actual
     }
-    public void updatePointsTextView() {
+    public void updatePointsTextView(int totalPoints) {
         // Actualizar el contenido del TextView con la puntuación total
         valuePoints.setText(myApp.getTotalPointsAsString());
     }

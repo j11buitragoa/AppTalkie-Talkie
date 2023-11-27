@@ -123,7 +123,7 @@
         android:layout_marginTop="50dp"
         android:backgroundTint="@color/dark_grey"
         android:gravity="center_horizontal"
-        android:text="Back"
+        android:text="Volver"
         android:textSize="25sp"
         android:visibility="visible" />
 

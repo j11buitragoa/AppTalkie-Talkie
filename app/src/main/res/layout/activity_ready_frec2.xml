@@ -13,11 +13,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="340dp"
         android:layout_height="600dp"
-        android:layout_margin="30dp"
-        android:background="@drawable/custom_edittext"
-        android:translationY="2dp"
         app:cardCornerRadius="30dp"
-        app:cardElevation="10dp">
+        app:cardElevation="20dp">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -206,18 +203,15 @@
                         app:srcCompat="@drawable/img_7" />
                 </LinearLayout>
                 <Button
-                    android:id="@+id/okf2"
-                    android:layout_width="321dp"
-                    android:layout_height="68dp"
-                    android:layout_centerInParent="true"
-                    android:layout_marginBottom="5dp"
+                    android:id="@+id/okButton"
+                    android:layout_width="276dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
                     android:backgroundTint="@color/blue"
                     android:text="OK"
-                    android:textAlignment="center"
-                    android:textSize="18sp"
-                    app:cornerRadius="20dp"
-                    tools:layout_editor_absoluteX="67dp"
-                    tools:layout_editor_absoluteY="1dp" />
+                    android:textSize="25sp"
+                    app:cornerRadius="20dp"/>
+
             </LinearLayout>
 
         </ScrollView>

@@ -33,7 +33,7 @@ import java.util.Random;
 
 public class Escucha_Orden extends AppCompatActivity {
 
-    private String TAG = "START";
+    private String TAG = "TAG";
     private final String USERS_COLLECTION = "User";
     private final String EJERCICIOS_COLLECTION="Ejercicios";
 
@@ -45,16 +45,15 @@ public class Escucha_Orden extends AppCompatActivity {
     private DocumentReference userDocRef;
     private int currentLevel = 1;
     private int currentPatternIndex = 0, currentPatternIndex2 = 0;
-    private int pointsToPassLevel = 3, successCount = 0, faultCount = 0;
+    private int successCount = 0, faultCount = 0;
+    private int[] pointsToPassLevelList = {3, 3, 4, 5};
     private int[][] rangeMs = {
-            {1000, 1500, 500}, // minMsL1, maxMsL1, waitTimeL1
-            {500, 1000, 300},  // minMsL2, maxMsL2, waitTimeL1
-            {200, 500, 200},
-            {100, 200, 200},
-            {100, 500, 200}// minMsL3, maxMsL3, waitTimeL1
+            {1000, 500}, // minMsL1, maxMsL1, waitTimeL1
+            {500, 300},  // minMsL2, maxMsL2, waitTimeL1
+            {200, 200},
+            {100, 200}
     };
     private int maxLevel = 4;
-    private int[][][] patterns = new int[maxLevel][pointsToPassLevel][2]; //Col 1: Canal, Col 2: Duration
 
     // UI Variables
     private Button leftButton, rightButton, backButton;
@@ -62,12 +61,16 @@ public class Escucha_Orden extends AppCompatActivity {
 
     // Audio Variables
     private AudioTrack audioTrack;
-    private int sampleRate = 8000, freqTone = 300, waitTime = 500, bufferSize;
+    private int sampleRate = 8000, waitTime = 500, bufferSize;
+    private int[] freqToneList = {300, 300, 300, 300};
     private short[] left, right, tone;
     private double gain = 1;
 
+    private Points points;
+
     private long responseTime;
-    private int[][] resultsLevel = new int[pointsToPassLevel][2]; // Col0: Patron Col1: Resultados
+    private int[][][] patterns; //Col 1: Canal, Col 2: Duration
+    private int[][] resultsLevel; // Col0: Patron Col1: Resultados
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,9 +82,53 @@ public class Escucha_Orden extends AppCompatActivity {
         user = mAuth.getCurrentUser();
         userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
 
+        points = (Points) getApplication();
+        points.updateMainActivityUI();
+
         String nombreEjercicio = "Ejercicio_" + currentLevel;
         ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
 
+        Intent intent = getIntent();
+        ArrayList<String> nivel1 = intent.getStringArrayListExtra("Nivel 1");
+        ArrayList<String> nivel2 = intent.getStringArrayListExtra("Nivel 2");
+        ArrayList<String> nivel3 = intent.getStringArrayListExtra("Nivel 3");
+        ArrayList<String> nivel4 = intent.getStringArrayListExtra("Nivel 4");
+
+        if (nivel1 == null || nivel2 == null || nivel3 == null || nivel4 == null){
+            Log.d(TAG, "Dato NULL");
+        }else {
+            Log.d(TAG,"Entra");
+            for (int i = 0;i<maxLevel;i++){
+                int duracionTono = 0, freqTono = 0, qtyTonos = 0;
+                switch (i){
+                    case 0:
+                        duracionTono = Integer.parseInt(nivel1.get(0));
+                        freqTono = Integer.parseInt(nivel1.get(1));
+                        qtyTonos = Integer.parseInt(nivel1.get(2));
+                        break;
+                    case 1:
+                        duracionTono = Integer.parseInt(nivel2.get(0));
+                        freqTono = Integer.parseInt(nivel2.get(1));
+                        qtyTonos = Integer.parseInt(nivel2.get(2));
+                        break;
+                    case 2:
+                        duracionTono = Integer.parseInt(nivel3.get(0));
+                        freqTono = Integer.parseInt(nivel3.get(1));
+                        qtyTonos = Integer.parseInt(nivel3.get(2));
+                        break;
+                    case 3:
+                        duracionTono = Integer.parseInt(nivel4.get(0));
+                        freqTono = Integer.parseInt(nivel4.get(1));
+                        qtyTonos = Integer.parseInt(nivel4.get(2));
+                        break;
+                }
+
+                //Guardar en variables globales
+                rangeMs[i][0] = duracionTono;
+                freqToneList[i] = freqTono;
+                pointsToPassLevelList[i] = qtyTonos;
+            }
+        }
 
         leftButton = findViewById(R.id.left_button);
         rightButton = findViewById(R.id.right_button);
@@ -124,16 +171,17 @@ public class Escucha_Orden extends AppCompatActivity {
         }else {
             faultCount++;
         }
-        if (successCount+faultCount >= pointsToPassLevel){
+        if (successCount+faultCount >= pointsToPassLevelList[currentLevel-1]){
             responseTime = System.currentTimeMillis() - responseTime;
-            sendDataBase(user.getUid(),hearOrderDocument, resultsLevel, currentLevel, pointsToPassLevel);
-            if (successCount == pointsToPassLevel){
+            sendDataBase(user.getUid(),hearOrderDocument, resultsLevel, currentLevel, pointsToPassLevelList[currentLevel-1]);
+            if (successCount == pointsToPassLevelList[currentLevel-1]){
                 currentLevel++;
                 if (currentLevel <= maxLevel){
                     Toast.makeText(Escucha_Orden.this, "PASAS DE NIVEL", Toast.LENGTH_SHORT).show();
                     waitTime(2000);
                     setPatterns();
                     startLevel();
+                    addPoints( currentLevel);
                 }
                 else {
                     Toast.makeText(Escucha_Orden.this, "Fin del juego", Toast.LENGTH_SHORT).show();
@@ -150,19 +198,24 @@ public class Escucha_Orden extends AppCompatActivity {
         }
         currentPatternIndex2++;
     }
+
+    private void addPoints( int level) {
+        String sectionName = "Escucha_Orden";
+        ((Points) getApplication()).addPoints(sectionName, level);
+    }
     private void playPattern(){
         boolean isRunning = true;
         int top = 0, played = 0;
 
         while (isRunning){
-            if (currentPatternIndex < pointsToPassLevel){
+            if (currentPatternIndex < pointsToPassLevelList[currentLevel-1]){
                 if (played == top) {
                     waitTime(1000);
                     if (patterns[currentLevel-1][currentPatternIndex][0] == 1) {
-                        left = setTone(gain, patterns[currentLevel-1][currentPatternIndex][1], freqTone, sampleRate);
+                        left = setTone(gain, patterns[currentLevel-1][currentPatternIndex][1], freqToneList[currentLevel-1], sampleRate);
                         right = new short[left.length];
                     } else {
-                        right = setTone(gain, patterns[currentLevel-1][currentPatternIndex][1], freqTone, sampleRate);
+                        right = setTone(gain, patterns[currentLevel-1][currentPatternIndex][1], freqToneList[currentLevel-1], sampleRate);
                         left = new short[right.length];
                     }
                     tone = stereoSound(left, right);
@@ -178,7 +231,7 @@ public class Escucha_Orden extends AppCompatActivity {
                             AudioTrack.MODE_STATIC);
 
                     audioTrack.write(tone, 0, tone.length);
-                    waitTime(rangeMs[currentLevel-1][2]);
+                    waitTime(rangeMs[currentLevel-1][1]);
                     audioTrack.play();
                     currentPatternIndex++;
                 }
@@ -201,25 +254,24 @@ public class Escucha_Orden extends AppCompatActivity {
         responseTime = System.currentTimeMillis();
     }
     private void setPatterns(){
-        int minMs, maxMs, tmpRandom;
         Random random = new Random();
+
+        //AQUI
+        patterns = new int[maxLevel][pointsToPassLevelList[currentLevel-1]][2];
+        resultsLevel = new int[pointsToPassLevelList[currentLevel-1]][2];
 
         leftButton.setEnabled(false);
         rightButton.setEnabled(false);
 
-
-        for (int j = 0; j<pointsToPassLevel;j++){
+        for (int j = 0; j<pointsToPassLevelList[currentLevel-1];j++){
             patterns[currentLevel-1][j][0] = random.nextInt(2)+1;
-            minMs = (int)(rangeMs[currentLevel-1][0]/10);
-            maxMs = (int)(rangeMs[currentLevel-1][1]/10);
-            tmpRandom = (random.nextInt((maxMs-minMs)+1) + minMs) * 10;
-            patterns[currentLevel-1][j][1] = tmpRandom;
+            patterns[currentLevel-1][j][1] = rangeMs[currentLevel-1][0];
             resultsLevel[j][0] = patterns[currentLevel-1][j][0];
         }
         // Imprimir
-        Log.d("MATRIX", "Set Level " + String.valueOf(currentLevel));
-        for (int j = 0; j < pointsToPassLevel; j++) {
-            Log.d("MATRIX", "" + patterns[currentLevel-1][j][0] + "    " + patterns[currentLevel-1][j][1]);
+        Log.d(TAG, "Set Level " + currentLevel);
+        for (int j = 0; j < pointsToPassLevelList[currentLevel-1]; j++) {
+            Log.d(TAG, "" + patterns[currentLevel-1][j][0] + "    " + patterns[currentLevel-1][j][1]);
         }
     }
     private short[] setTone(double gain, int durationTimeMs, int freq, int sampleRate) {
@@ -323,4 +375,31 @@ public class Escucha_Orden extends AppCompatActivity {
                     Log.e(TAG, "Error al obtener la cantidad de intentos", e);
                 });
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopAudioPlayback();
+
+    }
+
+    public void onBackPressed() {
+        super.onBackPressed();
+        stopAudioPlayback();
+        finish();
+
+    }
+
+    private void stopAudioPlayback() {
+        if (audioTrack != null) {
+            audioTrack.stop();
+            audioTrack.release();
+            audioTrack = null;
+        }
+    }
+    protected void onDestroy() {
+        super.onDestroy();
+        stopAudioPlayback();
+    }
+
 }

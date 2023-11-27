@@ -53,6 +53,7 @@ public class Escucha_Frecuencia extends AppCompatActivity {
     private int[][] freqDiffArray = new int[maxLevel][pointsToPass];
     private int checkCondition = 0;
     private int duration = 1000;
+    private Points points;
     private long responseTime;
     private DocumentReference hearFreqDocument;
     private int[][] resultsLevel = new int[pointsToPass][4]; // Col0: resultado Col1: tiempoRespuesta Col2:freq1 Col3:freq2
@@ -70,6 +71,8 @@ public class Escucha_Frecuencia extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
         userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+        points = (Points) getApplication();
+        points.updateMainActivityUI();
 
         String nombreEjercicio = "Ejercicio_" + currentLevel;
         ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
@@ -332,6 +335,7 @@ public class Escucha_Frecuencia extends AppCompatActivity {
                 currentLevel++;
                 if (currentLevel <= maxLevel) {
                     Log.d(TAG, "Pasa de nivel");
+                    addPoints(successPoints, currentLevel);
                 }
             }else {
                 // Repite nivel
@@ -347,6 +351,11 @@ public class Escucha_Frecuencia extends AppCompatActivity {
                 finish();
             }
         }
+    }
+
+    private void addPoints(int points, int level) {
+        String sectionName = "Escucha_Frecuencia";
+        ((Points) getApplication()).addPoints(sectionName, points);
     }
     class PlayFreqRunnable implements Runnable {
         @Override
@@ -449,5 +458,17 @@ public class Escucha_Frecuencia extends AppCompatActivity {
                     Log.e(TAG, "Error al obtener la cantidad de intentos", e);
                 });
 
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

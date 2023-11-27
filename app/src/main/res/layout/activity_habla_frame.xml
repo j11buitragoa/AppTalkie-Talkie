@@ -53,7 +53,6 @@
                 android:gravity="start"
                 android:paddingStart="40dp"
                 android:paddingTop="14dp"
-                android:drawableRight="@drawable/baseline_check_24"
                 android:drawableTint="@color/dark_grey"
                 android:backgroundTint="@color/white"
                 android:layout_marginTop="@dimen/marginExt"
@@ -73,7 +72,6 @@
                 android:gravity="start"
                 android:paddingStart="40dp"
                 android:paddingTop="14dp"
-                android:drawableRight="@drawable/baseline_check_24"
                 android:drawableTint="@color/dark_grey"
                 android:backgroundTint="@color/white"
                 android:layout_marginTop="@dimen/marginInt"
@@ -93,7 +91,6 @@
                 android:gravity="start"
                 android:paddingStart="40dp"
                 android:paddingTop="14dp"
-                android:drawableRight="@drawable/baseline_pending_24"
                 android:drawableTint="@color/dark_grey"
                 android:backgroundTint="@color/white"
                 android:layout_marginTop="@dimen/marginInt"
@@ -112,7 +109,7 @@
         android:backgroundTint="@color/dark_grey"
         android:gravity="center_horizontal"
         android:layout_marginBottom="25dp"
-        android:text="Back"
+        android:text="Volver"
         android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent" />
 

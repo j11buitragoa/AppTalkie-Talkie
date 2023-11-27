@@ -47,10 +47,30 @@
                 android:layout_width="272dp"
                 android:layout_height="47dp"
                 android:layout_marginTop="5dp"
-                android:paddingStart="15dp"
+                android:textAlignment="center"
                 android:textSize="20sp"
                 android:background="@drawable/custom_edittext"
-                android:padding="8dp"
+                android:inputType="number"/>
+
+            <TextView
+                android:id="@+id/textFreq"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Frecuencia del tono [Hz]"
+                android:textAlignment="center"
+                android:textColor="@color/blue"
+                android:textSize="17sp"
+                android:textStyle="bold"/>
+
+            <EditText
+                android:id="@+id/editFreq"
+                android:layout_width="272dp"
+                android:layout_height="47dp"
+                android:layout_marginTop="5dp"
+                android:textSize="20sp"
+                android:textAlignment="center"
+                android:background="@drawable/custom_edittext"
                 android:inputType="number"/>
 
             <TextView
@@ -58,7 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="Cantidad tonos"
+                android:text="Cantidad de tonos"
                 android:textAlignment="center"
                 android:textColor="@color/blue"
                 android:textSize="17sp"
@@ -69,10 +89,9 @@
                 android:layout_width="272dp"
                 android:layout_height="47dp"
                 android:layout_marginTop="5dp"
-                android:paddingStart="15dp"
                 android:textSize="20sp"
+                android:textAlignment="center"
                 android:background="@drawable/custom_edittext"
-                android:padding="8dp"
                 android:inputType="number"/>
 
             <Button
@@ -92,7 +111,7 @@
                 android:backgroundTint="@color/dark_grey"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="20dp"
-                android:text="Cancelar"
+                android:text="Volver"
                 android:textSize="18sp"
                 app:cornerRadius="20dp"/>
 

@@ -106,7 +106,7 @@
         android:layout_marginHorizontal="30dp"
         android:gravity="center_horizontal"
         android:backgroundTint="@color/dark_grey"
-        android:text="Back"
+        android:text="Volver"
         android:textSize="25sp" />
 
 </LinearLayout>

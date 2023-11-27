@@ -49,7 +49,7 @@ public class duracion extends AppCompatActivity {
     private List<Long> tiemposPorRepeticion = new ArrayList<>();
 
     private static int MIC_PERMISSION_CODE = 200;
-    private String TAG = "Hola";
+    private String TAG = "TAG";
     private TextView textViewStatus;
     private double energyThreshold = 10000000.0;
     private double energyThreshold2 = 100000000000.0;//1000000.0;
@@ -110,6 +110,9 @@ public class duracion extends AppCompatActivity {
     private CollectionReference talkCollection;
     private DocumentReference talkdurDocument;
 
+    private Points points;
+    private int tiempoSilencio = 5, tiempoDuracionVoz = 5, num = 5;
+
     private boolean is80PercentReached = false; // Agrega esta variable
 
     @SuppressLint("MissingInflatedId")
@@ -128,8 +131,25 @@ public class duracion extends AppCompatActivity {
         user = mAuth.getCurrentUser();
         userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
 
+        points = (Points) getApplication();
+        points.updateMainActivityUI();
+
         String nombreEjercicio = "Ejercicio_" + 13;
         ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
+
+        Intent intent = getIntent();
+        ArrayList<String> nivel1 = intent.getStringArrayListExtra("Nivel 1");
+
+        if (nivel1 == null){
+            Log.d(TAG, "Dato NULL");
+        }else {
+            tiempoSilencio = Integer.parseInt(nivel1.get(0));
+            tiempoDuracionVoz = Integer.parseInt(nivel1.get(1));
+            num = Integer.parseInt(nivel1.get(2));
+            Log.d(TAG,"tiempoSilencio " + tiempoSilencio);
+            Log.d(TAG,"tiempoDuracionVoz " + tiempoDuracionVoz);
+            Log.d(TAG,"num " + num);
+        }
 
 
         silenceImg = findViewById(R.id.silenceImg);
@@ -315,6 +335,8 @@ public class duracion extends AppCompatActivity {
 
                             is80PercentReached = true;
                             Log.d("Puntos", "" + puntos1);
+                            addPoints(puntos1);
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -396,6 +418,11 @@ public class duracion extends AppCompatActivity {
 
 
 
+    }
+
+    private void addPoints(int points) {
+        String sectionName = "Escucha_Duracion";
+        ((Points) getApplication()).addPoints(sectionName, points);
     }
 
     private DocumentReference getEjercicioDocument(int level) {
@@ -487,8 +514,10 @@ public class duracion extends AppCompatActivity {
     }
 
     private long getSilenceDurationFromEditText() {
+        /*
         SharedPreferences preferences = getSharedPreferences("mis_datos", MODE_PRIVATE);
         int tiempoSilencio = preferences.getInt("tiempo_sil", 0);
+         */
         String tiempoSilencioF = String.valueOf(tiempoSilencio);
         long silenceInSeconds = 1;
 
@@ -502,8 +531,10 @@ public class duracion extends AppCompatActivity {
     }
 
     private int getNumRepetitionsFromEditText() {
+        /*
         SharedPreferences preferences = getSharedPreferences("mis_datos", MODE_PRIVATE);
         int num = preferences.getInt("num", 0);
+         */
         String numText = String.valueOf(num);
         int numRepetitions = 1;
 
@@ -517,8 +548,10 @@ public class duracion extends AppCompatActivity {
     }
 
     private long getDurationFromEditText() {
+        /*
         SharedPreferences preferences = getSharedPreferences("mis_datos", MODE_PRIVATE);
         int tiempoDuracionVoz = preferences.getInt("tiempo_voz", 0);
+         */
         String timeText = String.valueOf(tiempoDuracionVoz);
 
         long durationInSeconds = 5;

@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,8 @@ public class Ready_Int extends AppCompatActivity {
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
     RingDrawer ringDrawer;
+    Intent goIntensidad;
+    private int ringWidth, ringSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +43,10 @@ public class Ready_Int extends AppCompatActivity {
         setContentView(R.layout.activity_ready_int);
         okButton = findViewById(R.id.okButton);
         adminButton = findViewById(R.id.adminButton);
+        goIntensidad = new Intent(this,Habla_Intensidad.class);
 
         okButton.setOnClickListener(view -> {
-            Intent goTime = new Intent(this,Habla_Intensidad.class);
-            startActivity(goTime);
+            startActivity(goIntensidad);
         });
 
         adminButton.setOnClickListener(v -> {
@@ -134,7 +137,16 @@ public class Ready_Int extends AppCompatActivity {
         });
 
         saveButton.setOnClickListener(v -> {
-
+            if (selectLevel != null){
+                ArrayList<String> datos = new ArrayList<>();
+                datos.add(editTiempoHabla.getText().toString());
+                datos.add(String.valueOf(ringSize));
+                datos.add(String.valueOf(ringWidth));
+                goIntensidad.putStringArrayListExtra(selectLevel, datos);
+                Toast.makeText(this, "        " + selectLevel + "\nDatos guardados", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(this, "Selecciona un nivel", Toast.LENGTH_SHORT).show();
+            }
         });
 
         cancelButton.setOnClickListener(v -> {
@@ -144,7 +156,8 @@ public class Ready_Int extends AppCompatActivity {
         seekBarSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                ringDrawer.drawRingWithSize(progress);
+                ringSize = progress;
+                ringDrawer.drawRingWithSize(ringSize);
             }
 
             @Override
@@ -159,7 +172,8 @@ public class Ready_Int extends AppCompatActivity {
         seekBarWidth.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                ringDrawer.drawRingWithWidth(progress);
+                ringWidth = progress;
+                ringDrawer.drawRingWithWidth(ringWidth);
             }
 
             @Override

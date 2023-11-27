@@ -35,6 +35,7 @@ import com.google.firebase.firestore.SetOptions;
 
 import org.jtransforms.fft.DoubleFFT_1D;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -86,6 +87,7 @@ public class tono extends AppCompatActivity {
     private FirebaseUser user;
     private CollectionReference talkCollection;
     private DocumentReference talktonoDocument;
+    private int tiempoDuracionVoz = 5, num = 5, tiempoSilencio = 5;
 
 
     private double umbral = 1000;
@@ -108,6 +110,20 @@ public class tono extends AppCompatActivity {
 
         String nombreEjercicio = "Ejercicio_" + 14;
         ejercicioDoc = db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
+
+        Intent intent = getIntent();
+        ArrayList<String> nivel1 = intent.getStringArrayListExtra("Nivel 1");
+
+        if (nivel1 == null){
+            Log.d(TAG, "Dato NULL");
+        }else {
+            tiempoSilencio = Integer.parseInt(nivel1.get(0));
+            tiempoDuracionVoz = Integer.parseInt(nivel1.get(1));
+            num = Integer.parseInt(nivel1.get(2));
+            Log.d(TAG,"tiempoSilencio " + tiempoSilencio);
+            Log.d(TAG,"tiempoDuracionVoz " + tiempoDuracionVoz);
+            Log.d(TAG,"num " + num);
+        }
 
         audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, intRecordSampleRate, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT, intMicBufferSize, AudioTrack.MODE_STREAM);
         intStereoBufferSize = intMicBufferSize * 2;
@@ -536,18 +552,24 @@ public class tono extends AppCompatActivity {
         return stereoSoundArray;
     }
     private long getSilenceDurationFromEditText() {
+        /*
         SharedPreferences preferences = getSharedPreferences("tono", MODE_PRIVATE);
         int tiempoSilencio = preferences.getInt("tsilencioValue", 0);
+         */
         return tiempoSilencio*1000 ;
     }
     private int getNumRepetitionsFromEditText() {
+        /*
         SharedPreferences preferences = getSharedPreferences("tono", MODE_PRIVATE);
         int num = preferences.getInt("vecesValue", 0);
+         */
         return num;
     }
     private long getDurationFromEditText() {
+        /*
         SharedPreferences preferences = getSharedPreferences("tono", MODE_PRIVATE);
         int tiempoDuracionVoz = preferences.getInt("sostenidoValue", 0);
+         */
         return tiempoDuracionVoz * 1000;
     }
     @Override
