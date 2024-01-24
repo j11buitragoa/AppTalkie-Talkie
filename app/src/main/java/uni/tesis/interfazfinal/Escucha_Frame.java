@@ -9,12 +9,17 @@ import android.widget.Button;
 public class Escucha_Frame extends AppCompatActivity {
 
     Button hearTimeButton, hearFreqButton, hearOrderButton, hearVowelsButton, backButton;
-
+    Points myApp;
+    long startTime;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_escucha_frame);
+       // myApp = (Points) getApplication();
 
+        // Inicia la sesión y registra la marca de tiempo al inicio
+        //myApp.startSession();
+        startTime = System.currentTimeMillis();
         hearTimeButton = findViewById(R.id.timeButton);
         hearFreqButton = findViewById(R.id.freqButton);
         hearOrderButton = findViewById(R.id.orderButton);
@@ -43,5 +48,14 @@ public class Escucha_Frame extends AppCompatActivity {
         });
 
 
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Finaliza la sesión y registra la marca de tiempo al cerrar la actividad
+        //myApp.endSession();
+
+        // Resto del código...
     }
 }

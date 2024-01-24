@@ -12,9 +12,39 @@ public class Points extends Application {
     private int[] pointsPerLevel = new int[NUM_LEVELS];
     private Map<String, MainActivity> mainActivities = new HashMap<>();
     private Map<String, Integer> pointsPerSection = new HashMap<>();
+    private TiempoUsoApp tiempoUsoApp;
 
+    private long totalAppUsageTime = 0;
+    private long sessionStartTime = 0;
     private MainActivity mainActivity;
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        tiempoUsoApp = new TiempoUsoApp(getApplicationContext());
+        tiempoUsoApp.iniciarMedicion();
+    }
+
+    @Override
+    public void onTerminate() {
+        tiempoUsoApp.detenerMedicion();
+        super.onTerminate();
+    }
+    public long getTotalAppUsageTime() {
+        return totalAppUsageTime;
+    }
+
+    public void startSession() {
+        sessionStartTime = System.currentTimeMillis();
+    }
+
+    public void endSession() {
+        if (sessionStartTime > 0) {
+            long sessionEndTime = System.currentTimeMillis();
+            totalAppUsageTime += (sessionEndTime - sessionStartTime);
+            sessionStartTime = 0;
+        }
+    }
     public int getTotalPoints() {
         return totalPoints;
     }

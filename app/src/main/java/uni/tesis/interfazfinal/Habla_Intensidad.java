@@ -76,25 +76,31 @@ public class Habla_Intensidad extends AppCompatActivity {
     //private static final long SUCCESS_DURATION = 1000;  // Duración en milisegundos para mostrar el éxito
 
     private Button backButton;
+    private int okCount = 0;
 
     private boolean isAdminMode = false;
     private boolean bpoints=false;
     private int puntos;
     private long responseTime;
+    private long startTime;
     private int currentIndex = 0, contDown = 0, contUp = 0;
     private int POINTS_TO_WIN = 10;
     private int ringSize = 300, ringWidth = 50;
     private Points points;
     private int[][] resultsLevel = new int[POINTS_TO_WIN][6]; //Col0: successDuration Col1: sizeRing Col2: widthRing Col3:durationIntento Col4: cantUP col5:cantDown
+    List<int[][]> resultsLevelsList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_habla_intensidad);
 
+        points = (Points) getApplication();
+        points.startSession();
+        startTime = System.currentTimeMillis();
+
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        user = mAuth.getCurrentUser();
         user = mAuth.getCurrentUser();
         userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
         String nombreEjercicio = "Ejercicio_" + 12;
@@ -113,6 +119,19 @@ public class Habla_Intensidad extends AppCompatActivity {
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
 
         backButton.setOnClickListener(v -> {
+            //okCount = 0;
+            Log.d(TAG, "Puntos " + puntos) ;
+
+            if (!resultsLevelsList.isEmpty()) {
+                // Envía los datos acumulados a Firebase
+                for (int i = 0; i < resultsLevelsList.size(); i++) {
+                    int[][] resultsLevel = resultsLevelsList.get(i);
+                    sendDataBase(user.getUid(), talkIntensityDocument, resultsLevelsList);
+                }
+                // Limpia la lista después de enviar los datos
+                resultsLevelsList.clear();
+            }
+
             Intent goHablaMenu = new Intent(this, Habla_Frame.class);
             startActivity(goHablaMenu);
         });
@@ -255,50 +274,62 @@ public class Habla_Intensidad extends AppCompatActivity {
         String nombreEjercicio = "Ejercicio_" + 12;
         return db.collection(EJERCICIOS_COLLECTION).document(nombreEjercicio);
     }
-    private void sendDataBase(String userId, DocumentReference userdoc, int[][] matrix, int level, int pointsWIN){
-        DocumentReference ejercicioDoc = getEjercicioDocument(level);
-        Map<String, Object> mapa = new HashMap<>();
-        // String tmp1, tmp2;
-        List<Integer> duration = new ArrayList<>();
-        List<String> size = new ArrayList<>();
-        List<String> width = new ArrayList<>();
+    private void sendDataBase(String userId, DocumentReference userdoc, List<int[][]> resultsLevelsList){
+        for (int i = 0; i < resultsLevelsList.size(); i++) {
+            int[][] resultsLevel = resultsLevelsList.get(i);
+            DocumentReference ejercicioDoc = getEjercicioDocument(i);
+            Map<String, Object> mapa = new HashMap<>();
+            // String tmp1, tmp2;
+            List<Long> duration = new ArrayList<>();
+            List<String> size = new ArrayList<>();
+            List<String> width = new ArrayList<>();
 
-        for(int i = 0;i<pointsWIN;i++){
-            duration.add(matrix[i][0]);
-            size.add(String.valueOf(matrix[i][1]));
-            width.add(String.valueOf(matrix[i][2]));
+            for (int j = 0; j < resultsLevel.length; j++) {
+                duration.add((long) resultsLevel[j][0]);
+                size.add(String.valueOf(resultsLevel[j][1]));
+                width.add(String.valueOf(resultsLevel[j][2]));
+            }
+
+            mapa.put("Duration", duration);
+            mapa.put("Size Ring", size);
+            mapa.put("Width Ring", width);
+            mapa.put("ejercicio", ejercicioDoc);
+            mapa.put("puntos",puntos);
+            Log.d(TAG, "Puntos en add" + puntos) ;
+
+            Log.d(TAG, "Duration: " + duration.toString());
+            Log.d(TAG, "Size Ring: " + size.toString());
+            Log.d(TAG, "Width Ring: " + width.toString());
+            Log.d(TAG, "Duration desde el mapa: " + mapa.get("Duration"));
+            Log.d(TAG, "Size Ring desde el mapa: " + mapa.get("Size Ring"));
+            Log.d(TAG, "Width Ring desde el mapa: " + mapa.get("Width Ring"));
+            DocumentReference userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
+            mapa.put("usuario", userDocRef);
+            Date fechaActual = Calendar.getInstance().getTime();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            String fechaHora = dateFormat.format(fechaActual);
+            mapa.put("fecha", fechaHora);
+            // Agrega el nuevo intento a la colección "Intentos"
+            db.collection("IntentosD")
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        int numIntentos = queryDocumentSnapshots.size();
+                        String intentoNombre = "Intento_" + (numIntentos + 1);
+
+                        db.collection("IntentosD")
+                                .document(intentoNombre)
+                                .set(mapa)
+                                .addOnSuccessListener(documentReference -> {
+                                    Log.d(TAG, "Datos del intento enviados correctamente");
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "Error al enviar datos del intento", e);
+                                });
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Error al obtener la cantidad de intentos", e);
+                    });
         }
-
-        mapa.put("Duration", duration);
-        mapa.put("Size Ring", size);
-        mapa.put("Width Ring", width);
-        mapa.put("Ejercicio",ejercicioDoc);
-        DocumentReference userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
-        mapa.put("User",userDocRef);
-        Date fechaActual = Calendar.getInstance().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        String fechaHora = dateFormat.format(fechaActual);
-        mapa.put("fecha",fechaHora);
-        // Agrega el nuevo intento a la colección "Intentos"
-        db.collection("Intentos")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    int numIntentos = queryDocumentSnapshots.size();
-                    String intentoNombre = "Intento_" + (numIntentos + 1);
-
-                    db.collection("Intentos")
-                            .document(intentoNombre)
-                            .set(mapa)
-                            .addOnSuccessListener(documentReference -> {
-                                Log.d(TAG, "Datos del intento enviados correctamente");
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.e(TAG, "Error al enviar datos del intento", e);
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error al obtener la cantidad de intentos", e);
-                });
     }
 
     private class SuccessMessage {
@@ -348,13 +379,28 @@ public class Habla_Intensidad extends AppCompatActivity {
                         drawSuccessTextOK(canvas, centerX, centerY);
                         responseTime = System.currentTimeMillis() - responseTime;
 
+                        int[][] currentResult = new int[POINTS_TO_WIN][3];
+                        currentResult[currentIndex][0] = (int) successDuration;
+                        currentResult[currentIndex][1] = ringSize;
+                        currentResult[currentIndex][2] = ringWidth;
 
-                        if (currentIndex>0 && currentIndex<=POINTS_TO_WIN){
-                            resultsLevel[currentIndex-1][0] = (int) successDuration;
-                            resultsLevel[currentIndex-1][1] = ringSize;
-                            resultsLevel[currentIndex-1][2] = ringWidth;
-                            sendDataBase(user.getUid(),talkIntensityDocument, resultsLevel, 1, POINTS_TO_WIN);
-                        }else {
+                        // Incrementa el conteo de "OK"
+
+
+                        resultsLevelsList.add(currentResult);
+                        //okCount = 0;
+
+                        currentIndex++;
+
+                        /*resultsLevel[0][0] = (int) successDuration;
+                        resultsLevel[0][1] = ringSize;
+                        resultsLevel[0][2] = ringWidth;
+                        sendDataBase(user.getUid(),talkIntensityDocument, resultsLevel, 1, POINTS_TO_WIN);*/
+                            if(currentIndex>=POINTS_TO_WIN){
+
+                                //sendDataBase(user.getUid(),talkIntensityDocument, resultsLevel, currentIndex, POINTS_TO_WIN);
+                            }
+                        else {
                             currentIndex = 0;
                         }
                     }
@@ -365,7 +411,7 @@ public class Habla_Intensidad extends AppCompatActivity {
                     isSuccessful = false;
                     isSuccessful = false;
                     if(bpoints){
-                        puntos++;
+                        Log.d(TAG, "Puntos en add" + puntos) ;
                         bpoints=false;
                         addPoints(puntos);
                     }
@@ -383,6 +429,8 @@ public class Habla_Intensidad extends AppCompatActivity {
         private void addPoints(int points) {
             String sectionName = "Escucha_Intensidad";
             ((Points) getApplication()).addPoints(sectionName, points);
+            //sendDataBase(user.getUid(),talkIntensityDocument, resultsLevel, 1, POINTS_TO_WIN);
+
         }
 
         private void drawSuccessTextOK(Canvas canvas, int centerX, int centerY) {
@@ -391,6 +439,8 @@ public class Habla_Intensidad extends AppCompatActivity {
             textPaint.setTextSize(80);
             textPaint.setTextAlign(Paint.Align.CENTER);
             canvas.drawText("OK", centerX, centerY, textPaint);
+            puntos++;
+
         }
 
         private void drawSuccessTextUP(Canvas canvas, int centerX, int centerY) {
@@ -409,6 +459,5 @@ public class Habla_Intensidad extends AppCompatActivity {
             canvas.drawText("DOWN", centerX, centerY, textPaint);
         }
     }
-
 
 }

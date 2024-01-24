@@ -347,21 +347,21 @@ public class Escucha_Orden extends AppCompatActivity {
         mapa.put("Result Level " + level, resultado);
         mapa.put("Time Level " + level, responseTime);
         mapa.put("Pattern Level " + level, patron);
-        mapa.put("Ejercicio",ejercicioDoc);
+        mapa.put("ejercicio",ejercicioDoc);
         DocumentReference userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
-        mapa.put("User",userDocRef);
+        mapa.put("usuario",userDocRef);
         Date fechaActual = Calendar.getInstance().getTime();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String fechaHora = dateFormat.format(fechaActual);
         mapa.put("fecha",fechaHora);
         // Agrega el nuevo intento a la colección "Intentos"
-        db.collection("Intentos")
+        db.collection("Intentosf")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     int numIntentos = queryDocumentSnapshots.size();
                     String intentoNombre = "Intento_" + (numIntentos + 1);
 
-                    db.collection("Intentos")
+                    db.collection("Intentosf")
                             .document(intentoNombre)
                             .set(mapa)
                             .addOnSuccessListener(documentReference -> {

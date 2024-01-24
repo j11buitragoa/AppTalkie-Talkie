@@ -41,7 +41,6 @@ public class Escucha_Tiempo extends AppCompatActivity {
     private TextView levelTextView, pointsTextView, failsTextView;
     private Button readyButton, toneButton1, toneButton2, backButton;
     private String TAG = "TAG";
-
     private final String USERS_COLLECTION = "User";
     private  final String EJERCICIOS_COLLECTION="Ejercicios";
     private final String TALK_COLLECTION = "TALK";
@@ -203,7 +202,8 @@ public class Escucha_Tiempo extends AppCompatActivity {
                             scoreTextView.setText("Score " + successCount);
                         }
                     });
-                    */
+
+                     */
                     isRunning = false;
                 }
             }
@@ -279,10 +279,7 @@ public class Escucha_Tiempo extends AppCompatActivity {
         ((Points) getApplication()).addPoints(sectionName, points);
     }
     private void checkAnswer(int selected) {
-        /*
-        if (!isReady || isPlaying) {
-            return;
-        }*/
+
         responseTime = System.currentTimeMillis() - responseTime;
         resultsLevel[currentIndex][1] = (int) responseTime;
 
@@ -381,21 +378,21 @@ public class Escucha_Tiempo extends AppCompatActivity {
 
         mapa.put("Result Level " + level, resultado);
         mapa.put("Time Level " + level, tiemposRespuesta);
-        mapa.put("Ejercicio",ejercicioDoc);
+        mapa.put("ejercicio",ejercicioDoc);
         DocumentReference userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
-        mapa.put("User",userDocRef);
+        mapa.put("usuario",userDocRef);
         Date fechaActual = Calendar.getInstance().getTime();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String fechaHora = dateFormat.format(fechaActual);
         mapa.put("fecha",fechaHora);
         // Agrega el nuevo intento a la colección "Intentos"
-        db.collection("Intentos")
+        db.collection("Intentosf")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     int numIntentos = queryDocumentSnapshots.size();
                     String intentoNombre = "Intento_" + (numIntentos + 1);
 
-                    db.collection("Intentos")
+                    db.collection("Intentosf")
                             .document(intentoNombre)
                             .set(mapa)
                             .addOnSuccessListener(documentReference -> {
@@ -408,12 +405,6 @@ public class Escucha_Tiempo extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error al obtener la cantidad de intentos", e);
                 });
-        /*doc.set(mapa, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Log.d(TAG, "Enviado");
-            }
-        });*/
     }
 
     @Override

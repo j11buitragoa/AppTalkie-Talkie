@@ -34,6 +34,9 @@ import java.util.List;
 import java.util.Map;
 
 public class admin_tono extends AppCompatActivity {
+    Points myApp;
+    long startTime;
+
     private Spinner spinnertono;
     private Button enviar;
     private Button salir;

@@ -31,12 +31,12 @@ public class Habla_Frame extends AppCompatActivity {
         });
 
         HtiempoButton.setOnClickListener(v -> {
-            Intent duracion =new Intent(this,Ready_duracion.class);
+            Intent duracion =new Intent(this,repro_dur_largo.class);
             startActivity(duracion);
 
         });
         HfrecuenciaButton.setOnClickListener(v -> {
-            Intent tono =new Intent(this,Ready_Tono.class);
+            Intent tono =new Intent(this,repro_staccato.class);
             startActivity(tono);
         });
 

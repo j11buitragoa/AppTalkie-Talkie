@@ -144,6 +144,7 @@ public class Ready_Int extends AppCompatActivity {
                 datos.add(String.valueOf(ringWidth));
                 goIntensidad.putStringArrayListExtra(selectLevel, datos);
                 Toast.makeText(this, "        " + selectLevel + "\nDatos guardados", Toast.LENGTH_SHORT).show();
+                //startActivity(goIntensidad);
             }else {
                 Toast.makeText(this, "Selecciona un nivel", Toast.LENGTH_SHORT).show();
             }

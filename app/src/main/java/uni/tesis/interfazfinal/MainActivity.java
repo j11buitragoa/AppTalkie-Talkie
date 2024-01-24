@@ -1,9 +1,12 @@
 package uni.tesis.interfazfinal;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.icu.util.Calendar;
 import android.media.tv.TvContract;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,17 +24,26 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private Points myApp;
     private TextView valuePoints;
-
     private String TAG = "TAG";
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    private final String USERS_COLLECTION = "User";
+    private FirebaseUser user,currentUser;
 
+    private final String USERS_COLLECTION = "User";
+    private DocumentReference userDocRef;
     private Button escuchaButton, hablaButton, vibrometriaButton, addButton;
     private TextView nameTittle;
 
@@ -39,10 +51,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        myApp = (Points) getApplication();
+        myApp.startSession();
         myApp=(Points)getApplication();
         valuePoints=findViewById(R.id.valuePoints);
         myApp.addMainActivity("MainActivity",this);
         updatePointsTextView(myApp.getTotalPoints());
+
+
 
         escuchaButton = findViewById(R.id.sensButton);
         hablaButton = findViewById(R.id.talkButton);
@@ -52,7 +68,8 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        DocumentReference docUsers = db.collection(USERS_COLLECTION).document(mAuth.getCurrentUser().getEmail());
+        user = mAuth.getCurrentUser();
+        userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
 
         ImageView logout=findViewById(R.id.logout);
         ImageView confiInt=findViewById(R.id.confiInt);
@@ -74,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         if(mAuth.getCurrentUser().getEmail().equals("admin@app.com")){
         }
 
-        docUsers.get().addOnSuccessListener(documentSnapshot ->
+        userDocRef.get().addOnSuccessListener(documentSnapshot ->
                 nameTittle.setText("Hola " + extraerNombre(documentSnapshot.getString("nombre"))));
 
         escuchaButton.setOnClickListener(view -> {
@@ -93,17 +110,62 @@ public class MainActivity extends AppCompatActivity {
         });
 
         addButton.setOnClickListener(view -> {
-            Intent goAdd = new Intent(this, Add_Audios_Frame.class);
+            Intent goAdd = new Intent(this, grabaciones.class);
             startActivity(goAdd);
         });
 
     }
     @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        myApp.endSession();
         myApp.removeMainActivity("MainActivity");
     }
     private void logout() {
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        //long tiempoTotal = tiempoUsoApp.obtenerTiempoTotal();
+        if (currentUser != null) {
+            // Obtén el tiempo total de uso
+            long tiempoTotal = myApp.getTotalAppUsageTime();
+            // Muestra el tiempo total de uso (puedes mostrarlo en un Toast, TextView, Log, etc.)
+            Log.d(TAG, "Tiempo total de uso de la aplicación: " + tiempoTotal);
+
+            Map<String, Object> mapa = new HashMap<>();
+            myApp.removeMainActivity("MainActivity");
+            int puntosGanados = myApp.getTotalPoints(); // Obtener puntos acumulados
+
+            mapa.put("puntos_ganados", puntosGanados);
+            //mapa.put("tiempo_total", totalTimeInSeconds);
+            //String userId = currentUser.getUid();
+            DocumentReference docUsers = db.collection(USERS_COLLECTION).document(currentUser.getEmail());
+            mapa.put("usuario",docUsers);
+            Date fechaActual = Calendar.getInstance().getTime();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            String fechaHora = dateFormat.format(fechaActual);
+            mapa.put("fecha",fechaHora);
+            db.collection("Tiempo").get().addOnSuccessListener(queryDocumentSnapshots -> {
+                int num = queryDocumentSnapshots.size();
+                String numT="tiempo_"+(num+1);
+                db.collection("Tiempo").document(numT).set(mapa).addOnSuccessListener(documentReference->{
+                    Log.d(TAG, "Datos del tiempo enviados correctamente");
+                }).addOnSuccessListener(e ->{
+                    //Log.e(TAG, "Error al enviar datos del intento", e);
+                });
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Error al obtener la cantidad de intentos", e);
+                    });
+        }
         mAuth.signOut();
 
         Intent intent = new Intent(MainActivity.this, Login.class);

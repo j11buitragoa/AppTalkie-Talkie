@@ -194,22 +194,24 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="30dp"
         android:clipToPadding="false"
         android:overScrollMode="never"
         android:padding="18dp"
         android:scrollbars="none"
-        android:layout_marginTop="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardHeader">
+        app:layout_constraintTop_toBottomOf="@id/cardHeader"
+        app:layout_constraintVertical_bias="1.0"
+        tools:layout_editor_absoluteX="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
             android:layout_marginLeft="6dp"
+            android:layout_marginTop="50dp"
             android:layout_marginEnd="6dp"
             android:layout_marginRight="6dp"
-            android:layout_marginTop="50dp"
             android:orientation="vertical">
 
             <!-- Ecualizacion -->
@@ -226,15 +228,15 @@
                     app:cardBackgroundColor="@color/pink"
                     app:cardCornerRadius="15dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent">
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="3dp"
                         android:src="@drawable/round_equalizer_24"
-                        app:tint="@color/white"/>
+                        app:tint="@color/white" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -262,22 +264,22 @@
                             android:id="@+id/eqButton"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="@string/textEq"
-                            android:textColor="@color/dark_grey"
                             android:backgroundTint="@color/white"
                             android:gravity="left"
                             android:paddingStart="0dp"
-                            android:textSize="25dp"/>
+                            android:text="@string/textEq"
+                            android:textColor="@color/dark_grey"
+                            android:textSize="25dp" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/confiInt"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
                             android:src="@drawable/baseline_help_24"
-                            app:tint="@color/light_grey"/>
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/light_grey" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
@@ -299,15 +301,15 @@
                     app:cardBackgroundColor="@color/yellow"
                     app:cardCornerRadius="15dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent">
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="3dp"
                         android:src="@drawable/baseline_sensors_24"
-                        app:tint="@color/white"/>
+                        app:tint="@color/white" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -335,22 +337,22 @@
                             android:id="@+id/sensButton"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="@string/textSens"
-                            android:textColor="@color/dark_grey"
                             android:backgroundTint="@color/white"
                             android:gravity="left"
                             android:paddingStart="0dp"
-                            android:textSize="25dp"/>
+                            android:text="@string/textSens"
+                            android:textColor="@color/dark_grey"
+                            android:textSize="25dp" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/escucInt"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
                             android:src="@drawable/baseline_help_24"
-                            app:tint="@color/light_grey"/>
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/light_grey" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
@@ -372,15 +374,15 @@
                     app:cardBackgroundColor="@color/green"
                     app:cardCornerRadius="15dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent">
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="5dp"
                         android:src="@drawable/baseline_record_voice_over_24"
-                        app:tint="@color/white"/>
+                        app:tint="@color/white" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -408,22 +410,22 @@
                             android:id="@+id/talkButton"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="@string/textTalk"
-                            android:textColor="@color/dark_grey"
                             android:backgroundTint="@color/white"
                             android:gravity="left"
                             android:paddingStart="0dp"
-                            android:textSize="25dp"/>
+                            android:text="@string/textTalk"
+                            android:textColor="@color/dark_grey"
+                            android:textSize="25dp" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/hablaInt"
                             android:layout_width="30dp"
                             android:layout_height="30dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
                             android:src="@drawable/baseline_help_24"
-                            app:tint="@color/light_grey"/>
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/light_grey" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
@@ -437,7 +439,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardIconAdd"
@@ -446,15 +448,15 @@
                     app:cardBackgroundColor="@color/red"
                     app:cardCornerRadius="15dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent">
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="3dp"
                         android:src="@drawable/round_mic_24"
-                        app:tint="@color/white"/>
+                        app:tint="@color/white" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -482,21 +484,21 @@
                             android:id="@+id/addButton"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="@string/textAdd"
-                            android:textColor="@color/dark_grey"
                             android:backgroundTint="@color/white"
                             android:gravity="left"
                             android:paddingStart="0dp"
-                            android:textSize="25dp"/>
+                            android:text="@string/textAdd"
+                            android:textColor="@color/dark_grey"
+                            android:textSize="25dp" />
 
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="30dp"
                             android:layout_height="30dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
                             android:src="@drawable/baseline_help_24"
-                            app:tint="@color/light_grey"/>
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="@color/light_grey" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>

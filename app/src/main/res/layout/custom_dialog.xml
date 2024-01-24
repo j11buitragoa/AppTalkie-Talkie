@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre de grabación" />
+
+        <Button
+            android:id="@+id/buttonStartRecording"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Iniciar Grabación" />
+
+        <Button
+            android:id="@+id/buttonStopRecording"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Guardar Grabación" />
+
+        <Button
+            android:id="@+id/buttonrepro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="reproducir" />
+
+        <Button
+            android:id="@+id/buttonCancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancelar" />
+        <Button
+            android:id="@+id/buttonReady"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Listo" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

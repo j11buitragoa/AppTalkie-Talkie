@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
+        android:name=".Points"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -13,9 +14,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.InterfazFinal"
-        tools:targetApi="31"
-        android:name=".Points">
-
+        tools:targetApi="31">
+        <activity
+            android:name=".confi_dur_largo"
+            android:exported="false" />
+        <activity
+            android:name=".repro_dur_largo"
+            android:exported="false" />
+        <activity
+            android:name=".dura_largo"
+            android:exported="false" />
+        <activity
+            android:name=".grabaciones"
+            android:exported="false" />
+        <activity
+            android:name=".repro_staccato"
+            android:exported="false" />
+        <activity
+            android:name=".confi_dstc"
+            android:exported="false" />
+        <activity
+            android:name=".duracion_staccato"
+            android:exported="false" />
         <activity
             android:name=".Ready_frec2"
             android:exported="false" />

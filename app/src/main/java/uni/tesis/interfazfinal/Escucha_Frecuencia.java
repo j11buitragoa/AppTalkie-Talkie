@@ -430,21 +430,21 @@ public class Escucha_Frecuencia extends AppCompatActivity {
 
         mapa.put("Result Level " + currentLevel, resultado);
         mapa.put("Time Level " + currentLevel, tiemposRespuesta);
-        mapa.put("Ejercicio",ejercicioDoc);
+        mapa.put("ejercicio",ejercicioDoc);
         mapa.put("Selected Freq " + currentLevel, frecuencias);
         DocumentReference userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
-        mapa.put("User",userDocRef);
+        mapa.put("usuario",userDocRef);
         Date fechaActual = Calendar.getInstance().getTime();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String fechaHora = dateFormat.format(fechaActual);
         mapa.put("fecha",fechaHora);
-        db.collection("Intentos")
+        db.collection("Intentosf")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     int numIntentos = queryDocumentSnapshots.size();
                     String intentoNombre = "Intento_" + (numIntentos + 1);
 
-                    db.collection("Intentos")
+                    db.collection("Intentosf")
                             .document(intentoNombre)
                             .set(mapa)
                             .addOnSuccessListener(documentReference -> {
