@@ -4,6 +4,7 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -15,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.icu.util.Calendar;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -23,13 +25,18 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams;
 import android.os.Handler;
 import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Interpolator;
@@ -60,6 +67,8 @@ public class dura_largo extends AppCompatActivity {
     private SpannableStringBuilder accumulatedText = new SpannableStringBuilder();
     private Handler uiHandler = new Handler(Looper.getMainLooper());
     private TextView tvResult,tiempoPronunciacion,message;
+    private ImageView silence;
+
     private static final float RMS_THRESHOLD = 8f; // Ajusta según sea necesario
     private boolean isSpeaking = false;
     private long startTimeSpeaking;
@@ -103,7 +112,7 @@ public class dura_largo extends AppCompatActivity {
     private boolean isSilent = true;
 
     private boolean isPuntuacionContada = false;
-
+    private ConstraintLayout constraintLayout;
     private int duration;
     private boolean isActive = false;
     private AudioRecord audioRecord;
@@ -121,6 +130,8 @@ public class dura_largo extends AppCompatActivity {
     private DocumentReference ejercicioDoc;
     private ArrayList<Long> elapsedTimes = new ArrayList<>();
     private  final String EJERCICIOS_COLLECTION="Ejercicios";
+    private long startTimeSpeaking2 = 0;
+    long tiempoRespuesta=0;
 
     private Points myApp;
     @Override
@@ -130,15 +141,28 @@ public class dura_largo extends AppCompatActivity {
         btnStartRecognition = findViewById(R.id.btnStartRecognition);
         tvResult = findViewById(R.id.tvResult);
         textVocal = findViewById(R.id.textVocal);
-        contadorSilencioTextView=findViewById(R.id.contadorSilencioTextView);
+        contadorSilencioTextView = findViewById(R.id.contadorSilencioTextView);
         tiempoPronunciacion = findViewById(R.id.tiempoPronunciacion);
-        tiempoDura=findViewById(R.id.tiempoDura);
-        puntos=findViewById(R.id.puntos);
-        imagePoint=findViewById(R.id.imagePoint);
+        tiempoDura = findViewById(R.id.tiempoDura);
+        puntos = findViewById(R.id.puntos);
+        imagePoint = findViewById(R.id.imagePoint);
         progressBar = findViewById(R.id.progressBar);
         message = findViewById(R.id.message);
+        silence = findViewById(R.id.silence);
         imagePoint.setVisibility(View.INVISIBLE);
         silenceCountdownTimer = createSilenceCountdownTimer();
+        constraintLayout=findViewById(R.id.dura_largo);
+        LinearLayout linearLayout = findViewById(R.id.linearLayout3);
+        // Obtén los parámetros de diseño actuales
+        LayoutParams layoutParams = (LayoutParams) linearLayout.getLayoutParams();
+        linearLayout.setGravity(Gravity.CENTER);
+
+        // Ajusta la posición vertical (mover hacia abajo en 50 píxeles)
+        layoutParams.topMargin += 150;
+
+        // Aplica los nuevos parámetros de diseño al LinearLayout
+        linearLayout.setLayoutParams(layoutParams);
+
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -165,8 +189,21 @@ public class dura_largo extends AppCompatActivity {
         Log.d(TAG, "silenceTime"+silenceTime);
         durationTimeInMillis=Long.parseLong(duraTime)*1000;
         duration=Integer.parseInt(duraTime);
+
+        // Configura las restricciones para posicionar la ProgressBar (ajusta los valores según tus necesidades)
+        ConstraintLayout.LayoutParams layoutParams7 = (ConstraintLayout.LayoutParams) progressBar.getLayoutParams();
+
+        // Establece las restricciones de posición (X, Y)
+        layoutParams7.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID; // Puedes ajustar estas restricciones según tus necesidades
+        layoutParams7.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams7.leftMargin = 5; // Coordenada X
+        layoutParams7.topMargin = 800; // Coordenada Y
+        // Aplica los parámetros de diseño a la ProgressBar
+        progressBar.setLayoutParams(layoutParams7);
         maxSilence = Integer.parseInt(silcTime);
         progressBar.setMax(maxSilence);
+
+
 
         Log.d("Envio", "veces: " + veces);
         //Log.d("Envio", "silc_time: " + silcTime);
@@ -202,7 +239,13 @@ public class dura_largo extends AppCompatActivity {
         timetext = findViewById(R.id.timetext);
         verificarPermisos();
         inicializarReconocedorVoz();
-        btnStartRecognition.setOnClickListener(view -> toggleVoiceRecognition());
+
+
+
+        btnStartRecognition.setOnClickListener(view ->
+                toggleVoiceRecognition()
+
+        );
 
         uiUpdateRunnable = () -> {
             tvResult.setText(accumulatedText.toString());
@@ -293,6 +336,35 @@ public class dura_largo extends AppCompatActivity {
 
     private void toggleVoiceRecognition() {
         if (!isListening) {
+            btnStartRecognition.setVisibility(View.INVISIBLE);
+            ConstraintLayout.LayoutParams layoutParams1 = (ConstraintLayout.LayoutParams) puntos.getLayoutParams();
+            layoutParams1.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+            layoutParams1.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+            layoutParams1.leftMargin = 150;  // Ajusta según tus necesidades
+            layoutParams1.topMargin = 200;  // Ajusta según tus necesidades
+            puntos.setLayoutParams(layoutParams1);
+
+
+            ConstraintLayout.LayoutParams layoutParams4 = (ConstraintLayout.LayoutParams) message.getLayoutParams();
+            layoutParams4.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+            layoutParams4.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+            layoutParams4.leftMargin = 150;  // Ajusta según tus necesidades
+            layoutParams4.topMargin = 500;  // Ajusta según tus necesidades
+            message.setLayoutParams(layoutParams4);
+
+            ConstraintLayout.LayoutParams layoutParams5 = (ConstraintLayout.LayoutParams) contadorSilencioTextView.getLayoutParams();
+            layoutParams5.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+            layoutParams5.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+            layoutParams5.leftMargin = 150;  // Ajusta según tus necesidades
+            layoutParams5.topMargin = 700;  // Ajusta según tus necesidades
+            contadorSilencioTextView.setLayoutParams(layoutParams5);
+
+            ConstraintLayout.LayoutParams layoutParams6 = (ConstraintLayout.LayoutParams) textVocal.getLayoutParams();
+            layoutParams6.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+            layoutParams6.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+            layoutParams6.leftMargin = 150;  // Ajusta según tus necesidades
+            layoutParams6.topMargin = 100;  // Ajusta según tus necesidades
+            textVocal.setLayoutParams(layoutParams6);
             startVoiceRecognition();
             isActive = true;
             thread.start();
@@ -350,6 +422,7 @@ public class dura_largo extends AppCompatActivity {
         audioRecord.stop();
         audioTrack.stop();
     }
+
     private short[] stereoSound(short[] left, short[] right, int stereoArraySize){
 
         short[] stereoSoundArray = new short[stereoArraySize];
@@ -371,7 +444,7 @@ public class dura_largo extends AppCompatActivity {
 
     private void startVoiceRecognition() {
         runOnUiThread(() -> {
-
+            startTimeSpeaking2 = System.currentTimeMillis();
             startTimeSelectedVocal = System.currentTimeMillis();
             startTimeVocalDetection = System.currentTimeMillis();
             if (speechRecognizer == null) {
@@ -400,6 +473,7 @@ public class dura_largo extends AppCompatActivity {
     }
 
     private void inicializarReconocedorVoz() {
+        int colorP = ContextCompat.getColor(this, R.color.blue);
         SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
         String selectedVocal = preferences.getString("selectedVocal", "LA");
         Log.d("SharedPreferencesRecibo", "Vocal seleccionada desde SharedPreferences: " + selectedVocal);
@@ -412,17 +486,25 @@ public class dura_largo extends AppCompatActivity {
                 startTimeSpeaking = System.currentTimeMillis();
                 startTimeVowelMap.clear();
                 isListening = true;
-                tiempoDura.setText("Tiempo que debes alcanzar:"+duraTime);
+
+                SpannableString spannableString = new SpannableString("Debes llegar a : " + duraTime + "   \nsegundos");
+                // Aplica el color rojo solo para la variable 'segundos'
+                ForegroundColorSpan colorRojo = new ForegroundColorSpan(colorP);
+                int inicio = spannableString.toString().indexOf(String.valueOf(duraTime));
+                int fin = inicio + String.valueOf(duraTime).length();
+                spannableString.setSpan(colorRojo, inicio, fin, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                tiempoDura.setText(spannableString);
+                //tiempoDura.setText("Debes llegar a :"+duraTime+" \nsegundos");
             }
 
             @Override
             public void onBeginningOfSpeech() {
                 Log.d("SpeechRecognizer", "Beginning of speech");
                 // Calcula el tiempo transcurrido desde el inicio hasta aquí
-                long elapsedTime = System.currentTimeMillis() - startTimeSpeaking;
-                Log.d("SpeechRecognizer", "Tiempo hasta comenzar a hablar: " + elapsedTime + " ms");
+                //long elapsedTime = System.currentTimeMillis() - startTimeSpeaking;
+                //Log.d("SpeechRecognizer", "Tiempo hasta comenzar a hablar: " + elapsedTime + " ms");
                 verificarPermisos();
-                elapsedTimes.add(elapsedTime);
+                //elapsedTimes.add(elapsedTime);
                 isSilent = false;
 
             }
@@ -449,7 +531,6 @@ public class dura_largo extends AppCompatActivity {
                     isSilent = true;
 
                 }
-                // Actualiza el progreso de la barra aquí cuando cambia el RMS
                 if (isSpeaking && isVowelMatch) {
                     long currentTime = System.currentTimeMillis();
                     elapsedTimeSinceVocalDetection = currentTime - startTimeVocalDetection;
@@ -549,13 +630,32 @@ public class dura_largo extends AppCompatActivity {
 
     private void actualizarTiempoPronunciacion(long tiempoTranscurrido) {
         int segundos = (int) (tiempoTranscurrido / 1000);
+        tiempoPronunciacion.setGravity(Gravity.CENTER);
+        tiempoDura.setGravity(Gravity.CENTER);
         if (isSpeaking) {
             uiHandler.post(() -> {
                 if (tiempoPronunciacion != null) {
-                    tiempoPronunciacion.setText("Tiempo de pronunciación: " + segundos + " segundos");
+                    int colorP = ContextCompat.getColor(this, R.color.blue);
+
+                    SpannableString spannableString = new SpannableString("Llevas: " + segundos + "   \nsegundos");
+                    // Aplica el color rojo solo para la variable 'segundos'
+                    ForegroundColorSpan colorRojo = new ForegroundColorSpan(colorP);
+                    int inicio = spannableString.toString().indexOf(String.valueOf(segundos));
+                    int fin = inicio + String.valueOf(segundos).length();
+                    spannableString.setSpan(colorRojo, inicio, fin, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    tiempoPronunciacion.setText(spannableString);
+
+                    //tiempoPronunciacion.setText("Llevas: " + segundos + "   \nsegundos");
                     if (segundos >= duration && !isPuntuacionContada && countDownTimer==null) {
                         puntos1++;
                         isPuntuacionContada = true;
+                        long tiempoActual = System.currentTimeMillis();
+
+                        tiempoRespuesta = tiempoActual - startTimeSpeaking2;
+                        Log.d(TAG, "Tiempo respuesta" + tiempoRespuesta);
+                        elapsedTimes.add(tiempoRespuesta);
+
+
                         if (imagePoint!= null) {
                             imagePoint.setVisibility(View.VISIBLE);
                             startSilenceCountdown();
@@ -568,6 +668,10 @@ public class dura_largo extends AppCompatActivity {
                         } else {
                             Log.e("TextViewPuntosError", "textViewPuntos es nulo");
                         }
+                        tiempoRespuesta =0;
+
+                        startTimeSpeaking2 = tiempoActual;
+
                     } else if (segundos < duration) {
                         // Restablecer el indicador si el tiempo es inferior a la duración
                         isPuntuacionContada = false;
@@ -592,7 +696,24 @@ public class dura_largo extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 silenceCount++;
                 updateSilenceCountTextView(silenceCount);
+                // Obtén los parámetros de diseño actuales del ConstraintLayout
+                ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) silence.getLayoutParams();
 
+                // Establece las nuevas dimensiones (ancho y alto) en píxeles (ajusta según tus necesidades)
+                layoutParams.width = 200;  // Ancho
+                layoutParams.height = 200; // Alto
+
+                // Establece las nuevas restricciones de posición (izquierda y arriba)
+                layoutParams.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID; // o establece la restricción izquierda con respecto a otra vista
+                layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;   // o establece la restricción superior con respecto a otra vista
+
+                // Establece las nuevas coordenadas (márgenes izquierdo y superior) en píxeles (ajusta según tus necesidades)
+                layoutParams.leftMargin = 300;  // Márgen izquierdo
+                layoutParams.topMargin = 300;   // Márgen superior
+
+                // Aplica los nuevos parámetros de diseño al ConstraintLayout
+                silence.setLayoutParams(layoutParams);
+                silence.setVisibility(View.VISIBLE);
                 // Verifica si la persona está en silencio
                 if (isSilent) {
                     progressBar.incrementProgressBy(1);  // Incrementa la barra de progreso en 1
@@ -601,7 +722,7 @@ public class dura_largo extends AppCompatActivity {
                     message.setVisibility(View.GONE);
                     if (silenceCount == Integer.parseInt(silcTime)) {
                         puntos1++;
-                        puntos.setText(Integer.toString(puntos1));
+                        puntos.setText("Puntos: " + Integer.toString(puntos1));
                     }
 
                 }else{
@@ -615,6 +736,7 @@ public class dura_largo extends AppCompatActivity {
             public void onFinish() {
                 // Se ha alcanzado el valor de silencio, reiniciar el temporizador y mostrar nuevas imágenes
                 silenceCount = 0;
+                silence.setVisibility(View.GONE);
                 conteoEnProgreso = false;
                 progressBar.setProgress(0);
 
@@ -654,7 +776,7 @@ public class dura_largo extends AppCompatActivity {
     // Obtén los resultados del reconocimiento de voz
 
     private void updateSilenceCountTextView(int count) {
-        contadorSilencioTextView.setText("Silence Count: " + count);
+        contadorSilencioTextView.setText("Tiempo en silencio: " + count);
 
     }
     private void updateTvResult(String text) {

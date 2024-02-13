@@ -33,15 +33,20 @@ import java.util.Set;
 
 public class confi_dstc extends AppCompatActivity {
     private Button start;
+
     private EditText nfonema,Rep,silencio_time;
     private AudioTrack audioTrack;
     private Spinner listagrab;
+    private long tiempoInicio;
+
     private String nombreGrabacionSeleccionada;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confi_dstc);
+        tiempoInicio = System.currentTimeMillis();
+
         start = findViewById(R.id.start);
         nfonema = findViewById(R.id.nfonema);
         Rep =  findViewById(R.id.rep);
@@ -73,6 +78,7 @@ public class confi_dstc extends AppCompatActivity {
                     Log.d(TAG, "nombreGrabacion" + nombreGrabacionSeleccionada);
                     Intent intent = new Intent(confi_dstc.this, repro_staccato.class);
                     startActivity(intent);
+                    finish();
                 } else {
                     // Si no se ha seleccionado una grabación, mostrar un mensaje al usuario
                     Toast.makeText(confi_dstc.this, "Por favor, seleccione una grabación", Toast.LENGTH_SHORT).show();
@@ -148,5 +154,19 @@ public class confi_dstc extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.d("confi_dur_cor", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("confi_dur_cor", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 }

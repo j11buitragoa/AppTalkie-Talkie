@@ -30,10 +30,14 @@ public class confi_dur_largo extends AppCompatActivity {
     private Button buttonstart,listagrab,tono;
     private Spinner spinner_voc;
     private EditText sil_time,dur_time,veces;
+    private long tiempoInicio;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confi_dur_largo);
+        tiempoInicio = System.currentTimeMillis();
+
         spinner_voc=findViewById(R.id.spinner_voc);
         buttonstart=findViewById(R.id.buttonstart);
         sil_time=findViewById(R.id.sil_time);
@@ -190,6 +194,7 @@ public class confi_dur_largo extends AppCompatActivity {
 
                 Intent intent = new Intent(confi_dur_largo.this, repro_dur_largo.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -268,6 +273,20 @@ public class confi_dur_largo extends AppCompatActivity {
         }
 
         return grabaciones;
+    }
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.d("confi_dur_largo", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("confi_dur_largo ", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 
 }

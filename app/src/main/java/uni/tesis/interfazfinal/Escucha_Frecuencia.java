@@ -38,6 +38,7 @@ public class Escucha_Frecuencia extends AppCompatActivity {
 
     private final String USERS_COLLECTION = "User";
     private final String EJERCICIOS_COLLECTION="Ejercicios";
+    private long tiempoInicio;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -67,6 +68,8 @@ public class Escucha_Frecuencia extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_escucha_frecuencia);
+        tiempoInicio = System.currentTimeMillis();
+
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
@@ -147,6 +150,8 @@ public class Escucha_Frecuencia extends AppCompatActivity {
         backButton.setOnClickListener(v -> {
             Intent goEscucha = new Intent(Escucha_Frecuencia.this, Escucha_Frame.class);
             startActivity(goEscucha);
+            finish();
+
         });
     }
 
@@ -419,10 +424,13 @@ public class Escucha_Frecuencia extends AppCompatActivity {
         List<Integer> tiemposRespuesta = new ArrayList<>();
         List<String> resultado = new ArrayList<>();
         List<String> frecuencias = new ArrayList<>();
+        int puntos1 = 0;
 
         for(int i = 0;i<pointsWIN;i++){
-            if (matrix[i][0] == 1) resultado.add("Acierto");
-            else resultado.add("Falla");
+            if (matrix[i][0] == 1) {resultado.add("Acierto");
+                puntos1++;
+            }
+            else{ resultado.add("Falla");}
             tiemposRespuesta.add(matrix[i][1]);
             frecuencias.add(matrix[i][2] + " , " + matrix[i][3]);
 
@@ -438,6 +446,8 @@ public class Escucha_Frecuencia extends AppCompatActivity {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String fechaHora = dateFormat.format(fechaActual);
         mapa.put("fecha",fechaHora);
+        mapa.put("puntos", puntos1);
+
         db.collection("Intentosf")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -462,6 +472,10 @@ public class Escucha_Frecuencia extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        Log.d("Escucha_Frec", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("Escucha_Frec", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 
     public void onBackPressed() {

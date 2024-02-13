@@ -65,6 +65,7 @@ public class Escucha_Orden extends AppCompatActivity {
     private int[] freqToneList = {300, 300, 300, 300};
     private short[] left, right, tone;
     private double gain = 1;
+    private long tiempoInicio;
 
     private Points points;
 
@@ -76,6 +77,7 @@ public class Escucha_Orden extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_escucha_orden);
+        tiempoInicio = System.currentTimeMillis();
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -141,6 +143,7 @@ public class Escucha_Orden extends AppCompatActivity {
         backButton.setOnClickListener(v -> {
             Intent goEscucha = new Intent(Escucha_Orden.this, Escucha_Frame.class);
             startActivity(goEscucha);
+            finish();
         });
 
         Toast.makeText(Escucha_Orden.this, "Comienza en 3 seg", Toast.LENGTH_SHORT).show();
@@ -335,12 +338,16 @@ public class Escucha_Orden extends AppCompatActivity {
         Map<String, Object> mapa = new HashMap<>();
         List<String> resultado = new ArrayList<>();
         List<String> patron = new ArrayList<>();
-
+        int puntos1 = 0;
         for(int i = 0;i<pointsWIN;i++){
             if (matrix[i][0] == 1) patron.add("L");
             else patron.add("R");
             if (matrix[i][1] == 1) resultado.add("L");
             else resultado.add("R");
+            // Comparación entre Result Level y Pattern Level
+            if (resultado.equals(patron)) {
+                puntos1=1;
+            }
 
         }
 
@@ -354,6 +361,8 @@ public class Escucha_Orden extends AppCompatActivity {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String fechaHora = dateFormat.format(fechaActual);
         mapa.put("fecha",fechaHora);
+        mapa.put("puntos", puntos1);
+
         // Agrega el nuevo intento a la colección "Intentos"
         db.collection("Intentosf")
                 .get()
@@ -380,7 +389,10 @@ public class Escucha_Orden extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         stopAudioPlayback();
-
+        Log.d("Escucha_Ord", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("Escucha_Ord", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 
     public void onBackPressed() {

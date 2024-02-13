@@ -57,6 +57,7 @@ public class Escucha_Tiempo extends AppCompatActivity {
     private boolean isReadyLevel = false;
     private boolean enableLevel = false;
     private boolean enableTones = false;
+    private long tiempoInicio;
 
 
     //private boolean isPlaying = false;
@@ -81,6 +82,7 @@ public class Escucha_Tiempo extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_escucha_tiempo);
+        tiempoInicio = System.currentTimeMillis();
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -126,6 +128,7 @@ public class Escucha_Tiempo extends AppCompatActivity {
         backButton.setOnClickListener(v -> {
             Intent goEscuchaMenu = new Intent(Escucha_Tiempo.this, Escucha_Frame.class);
             startActivity(goEscuchaMenu);
+            finish();
         });
     }
     private void startGame() {
@@ -368,10 +371,13 @@ public class Escucha_Tiempo extends AppCompatActivity {
         // String tmp1, tmp2;
         List<Integer> tiemposRespuesta = new ArrayList<>();
         List<String> resultado = new ArrayList<>();
-
+        int puntos1 = 0;
         for(int i = 0;i<pointsWIN;i++){
-            if (matrix[i][0] == 1) resultado.add("Acierto");
-            else resultado.add("Falla");
+            if (matrix[i][0] == 1) {
+                resultado.add("Acierto");
+                puntos1++;
+            }
+            else {resultado.add("Falla");}
             tiemposRespuesta.add(matrix[i][1]);
 
         }
@@ -385,6 +391,8 @@ public class Escucha_Tiempo extends AppCompatActivity {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String fechaHora = dateFormat.format(fechaActual);
         mapa.put("fecha",fechaHora);
+        mapa.put("puntos", puntos1);
+
         // Agrega el nuevo intento a la colección "Intentos"
         db.collection("Intentosf")
                 .get()
@@ -410,6 +418,10 @@ public class Escucha_Tiempo extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        Log.d("Escucha_Time", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("Escucha_Time", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 
     @Override

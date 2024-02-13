@@ -19,46 +19,35 @@
         app:layout_constraintVertical_bias="0.607"></LinearLayout>
 
 
-    <Button
-        android:id="@+id/startSpeechBtn"
-        android:layout_width="221dp"
-        android:layout_height="66dp"
-        android:text="Start Speech"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.147" />
-
     <TextView
         android:id="@+id/resultTextView"
         android:layout_width="144dp"
         android:layout_height="64dp"
-        android:text="TextView"
+        android:text=""
+        android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.355"
+        app:layout_constraintHorizontal_bias="0.059"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.295" />
-
-
-
+        app:layout_constraintVertical_bias="0.089" />
 
     <TextView
         android:id="@+id/silenceCountTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Silence Count: 0"
-        android:textSize="16sp"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal"
+        android:text="Tiempo en \n silencio: 0"
+        android:textSize="20sp"
+        tools:layout_editor_absoluteX="23dp"
+        tools:layout_editor_absoluteY="263dp" />
 
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="96dp"
-        android:layout_height="28dp"
+        android:layout_width="195dp"
+        android:layout_height="40dp"
+        android:progressDrawable="@drawable/custom_progress_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.549"
         app:layout_constraintStart_toStartOf="parent"
@@ -70,24 +59,26 @@
         android:layout_height="85dp"
         android:text=""
         android:visibility="invisible"
+        android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.269"
+        app:layout_constraintHorizontal_bias="0.052"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.407" />
+        app:layout_constraintVertical_bias="0.19" />
 
     <TextView
         android:id="@+id/puntos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="123dp"
+        android:layout_height="44dp"
         android:text="Puntos:"
+        android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.73"
+        app:layout_constraintHorizontal_bias="0.055"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/progressBar"
-        app:layout_constraintVertical_bias="0.327" />
+        app:layout_constraintVertical_bias="0.023" />
 
     <ImageView
         android:id="@+id/trofeo"
@@ -97,5 +88,31 @@
         app:srcCompat="@drawable/trofeo"
         tools:layout_editor_absoluteX="239dp"
         tools:layout_editor_absoluteY="303dp" />
+    <ImageView
+        android:id="@+id/silence"
+        android:layout_width="128dp"
+        android:layout_height="116dp"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/silenciop"
+        tools:layout_editor_absoluteX="141dp"
+        tools:layout_editor_absoluteY="137dp" />
+    <Button
+        android:id="@+id/startSpeechBtn"
+        android:layout_width="221dp"
+        android:layout_height="66dp"
+        android:text="Comenzar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/marginExt"
+        android:layout_marginTop="@dimen/marginExt"
+        android:layout_marginEnd="@dimen/marginExt"
+        android:layout_marginBottom="@dimen/marginInt"
+        android:textSize="25sp"
+        android:backgroundTint="@color/blue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.147" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

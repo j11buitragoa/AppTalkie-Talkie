@@ -31,11 +31,13 @@ public class Vibrometria extends AppCompatActivity {
     private int canal = 0, qtyButton = 0;
     private float curVol;
     private float[][] volumeArray = new float[2][freqList.length]; //ROW 0: LEFT - ROW 1: RIGHT
+    private long tiempoInicio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vibrometria);
+        tiempoInicio = System.currentTimeMillis();
 
         startThread = findViewById(R.id.startThread);
         audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -216,5 +218,19 @@ public class Vibrometria extends AppCompatActivity {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.d("Vibro", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("Vibro", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 }

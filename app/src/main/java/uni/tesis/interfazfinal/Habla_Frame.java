@@ -4,9 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 
 public class Habla_Frame extends AppCompatActivity {
+    private long tiempoInicio;
 
     Button talkIntensity, backButton,HtiempoButton,HfrecuenciaButton;
 
@@ -14,6 +16,7 @@ public class Habla_Frame extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_habla_frame);
+        tiempoInicio = System.currentTimeMillis();
 
         talkIntensity = findViewById(R.id.intensityButton);
         backButton = findViewById(R.id.backButton);
@@ -28,6 +31,7 @@ public class Habla_Frame extends AppCompatActivity {
         backButton.setOnClickListener(v -> {
             Intent goMenu = new Intent(this, MainActivity.class);
             startActivity(goMenu);
+            finish();
         });
 
         HtiempoButton.setOnClickListener(v -> {
@@ -40,5 +44,19 @@ public class Habla_Frame extends AppCompatActivity {
             startActivity(tono);
         });
 
+    }
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.d("Escucha_Frame", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("Escucha_Frame", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 }

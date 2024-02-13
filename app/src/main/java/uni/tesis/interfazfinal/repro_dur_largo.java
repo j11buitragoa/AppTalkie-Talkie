@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class repro_dur_largo extends AppCompatActivity {
-    private Button comenzar,reproducir,intentalo,admin;
+    private Button comenzar,reproducir,intentalo,admin,volver;
     private TextView result,silencio,pronunciar,tvResult,timetext;
     private long elapsedTimeSinceVocalDetection;
 
@@ -61,11 +61,15 @@ public class repro_dur_largo extends AppCompatActivity {
     private SpeechRecognizer speechRecognizer;
     private boolean isListening = false;
     private boolean isActive = false;
+    private long tiempoInicio;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_repro_dur_largo);
+        tiempoInicio = System.currentTimeMillis();
+
         SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
         final String fileName = preferences.getString("file_name", "");
         final String selectedVocal = preferences.getString("selected_vocal", "");
@@ -82,6 +86,7 @@ public class repro_dur_largo extends AppCompatActivity {
         tvResult = findViewById(R.id.tvResult);
         timetext = findViewById(R.id.timetext);
         admin=findViewById(R.id.admin);
+        volver=findViewById(R.id.volver);
 
 
         inicializarReconocedorVoz();
@@ -116,6 +121,7 @@ public class repro_dur_largo extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(repro_dur_largo.this, confi_dur_largo.class);
                 startActivity(intent);
+                finish();
             }
         });
         comenzar.setOnClickListener(new View.OnClickListener() {
@@ -123,6 +129,7 @@ public class repro_dur_largo extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(repro_dur_largo.this, dura_largo.class);
                 startActivity(intent);
+                finish();
             }
         });
         reproducir.setOnClickListener(new View.OnClickListener() {
@@ -135,6 +142,13 @@ public class repro_dur_largo extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 toggleVoiceRecognition();
+            }
+        });
+        volver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(repro_dur_largo.this, Habla_Frame.class);
+                startActivity(intent);
             }
         });
     }
@@ -490,6 +504,14 @@ public class repro_dur_largo extends AppCompatActivity {
         if (speechRecognizer != null) {
             speechRecognizer.destroy();
         }
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.d("dur_largo", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("dur_largo", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 
 }

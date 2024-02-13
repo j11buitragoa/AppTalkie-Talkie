@@ -81,7 +81,7 @@ public class Habla_Intensidad extends AppCompatActivity {
     private boolean isAdminMode = false;
     private boolean bpoints=false;
     private int puntos;
-    private long responseTime;
+    private long responseTime,responseT;
     private long startTime;
     private int currentIndex = 0, contDown = 0, contUp = 0;
     private int POINTS_TO_WIN = 10;
@@ -89,11 +89,15 @@ public class Habla_Intensidad extends AppCompatActivity {
     private Points points;
     private int[][] resultsLevel = new int[POINTS_TO_WIN][6]; //Col0: successDuration Col1: sizeRing Col2: widthRing Col3:durationIntento Col4: cantUP col5:cantDown
     List<int[][]> resultsLevelsList = new ArrayList<>();
+    List<Long> tiemposOkList = new ArrayList<>();
+    private boolean isPointCounted = false;
+    private long tiempoInicio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_habla_intensidad);
+        tiempoInicio = System.currentTimeMillis();
 
         points = (Points) getApplication();
         points.startSession();
@@ -134,6 +138,7 @@ public class Habla_Intensidad extends AppCompatActivity {
 
             Intent goHablaMenu = new Intent(this, Habla_Frame.class);
             startActivity(goHablaMenu);
+            finish();
         });
 
         Intent intent = getIntent();
@@ -163,6 +168,10 @@ public class Habla_Intensidad extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        Log.d("Habla_Int", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("Habla_Int", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 
     @Override
@@ -296,13 +305,14 @@ public class Habla_Intensidad extends AppCompatActivity {
             mapa.put("ejercicio", ejercicioDoc);
             mapa.put("puntos",puntos);
             Log.d(TAG, "Puntos en add" + puntos) ;
+            mapa.put("tiemposOkList", tiemposOkList);
 
             Log.d(TAG, "Duration: " + duration.toString());
             Log.d(TAG, "Size Ring: " + size.toString());
             Log.d(TAG, "Width Ring: " + width.toString());
             Log.d(TAG, "Duration desde el mapa: " + mapa.get("Duration"));
             Log.d(TAG, "Size Ring desde el mapa: " + mapa.get("Size Ring"));
-            Log.d(TAG, "Width Ring desde el mapa: " + mapa.get("Width Ring"));
+            Log.d(TAG, "tiemposOkList desde el mapa: " + mapa.get("tiemposOklist"));
             DocumentReference userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
             mapa.put("usuario", userDocRef);
             Date fechaActual = Calendar.getInstance().getTime();
@@ -310,13 +320,13 @@ public class Habla_Intensidad extends AppCompatActivity {
             String fechaHora = dateFormat.format(fechaActual);
             mapa.put("fecha", fechaHora);
             // Agrega el nuevo intento a la colección "Intentos"
-            db.collection("IntentosD")
+            db.collection("Intentosf")
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         int numIntentos = queryDocumentSnapshots.size();
                         String intentoNombre = "Intento_" + (numIntentos + 1);
 
-                        db.collection("IntentosD")
+                        db.collection("Intentosf")
                                 .document(intentoNombre)
                                 .set(mapa)
                                 .addOnSuccessListener(documentReference -> {
@@ -336,6 +346,7 @@ public class Habla_Intensidad extends AppCompatActivity {
 
         //private static final int RING_WIDTH = 0;  // Ancho del anillo
         //private static final int SUCCESS_THRESHOLD = 600;  // Tamaño objetivo del círculo
+        private long tiempoObtencionPunto = 0;
 
         private SurfaceHolder surfaceHolder;
 
@@ -367,17 +378,29 @@ public class Habla_Intensidad extends AppCompatActivity {
                 if ((circleSize >= (ringSize - ringWidth/2)) && ((circleSize <= (ringSize + ringWidth/2)))) {
                     contDown = 0;
                     contUp = 0;
-                    if (contDown + contUp == 0)
-                        responseTime = System.currentTimeMillis();
-
                     if (!isSuccessful) {
+
                         successStartTime = System.currentTimeMillis();
+
                         isSuccessful = true;
+                        isPointCounted = false; // Reiniciar la bandera de conteo de punto
                     } else if (System.currentTimeMillis() - successStartTime >= successDuration) {
                         // Cumplido, sigiuente nivel
                         bpoints=true;
+                        if (!isPointCounted) {  // Verificar si ya se contó un punto
+                            puntos++; // Incrementar puntos solo si no se ha contado antes
+                            isPointCounted = true; // Marcar que ya se contó un punto
+                            long tiempoActual = System.currentTimeMillis();
+
+                            tiempoObtencionPunto = tiempoActual - tiempoInicio;
+                            Log.d(TAG, "Tiempo obtencion punto: " + tiempoObtencionPunto);
+                            tiemposOkList.add(tiempoObtencionPunto);
+
+                            tiempoInicio = tiempoActual;
+
+
+                        }
                         drawSuccessTextOK(canvas, centerX, centerY);
-                        responseTime = System.currentTimeMillis() - responseTime;
 
                         int[][] currentResult = new int[POINTS_TO_WIN][3];
                         currentResult[currentIndex][0] = (int) successDuration;
@@ -439,7 +462,6 @@ public class Habla_Intensidad extends AppCompatActivity {
             textPaint.setTextSize(80);
             textPaint.setTextAlign(Paint.Align.CENTER);
             canvas.drawText("OK", centerX, centerY, textPaint);
-            puntos++;
 
         }
 

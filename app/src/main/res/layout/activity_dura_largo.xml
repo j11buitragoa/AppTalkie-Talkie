@@ -4,12 +4,142 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/dura_largo"
     tools:context=".dura_largo">
+
+
+    <TextView
+        android:id="@+id/textVocal"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="50sp"
+        android:gravity="center"
+        tools:layout_editor_absoluteX="153dp"
+        tools:layout_editor_absoluteY="43dp"  />
+
+
+    <TextView
+        android:id="@+id/puntos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Puntos: "
+        android:gravity="center"
+        android:textSize="25sp"
+        tools:layout_editor_absoluteX="25dp"
+        tools:layout_editor_absoluteY="113dp"
+        />
+
+
+
+    <TextView
+        android:id="@+id/contadorSilencioTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_gravity="center"
+        android:textSize="20sp"
+        android:gravity="center"
+        tools:layout_editor_absoluteX="150dp"
+        tools:layout_editor_absoluteY="363dp" />
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_gravity="center"
+        android:textSize="20sp"
+        android:gravity="center"
+        tools:layout_editor_absoluteX="153dp"
+        tools:layout_editor_absoluteY="263dp"  />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="195dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:progressDrawable="@drawable/custom_progress_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.549"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="0dp" />
+
+    <ImageView
+        android:id="@+id/trofeo"
+        android:layout_width="97dp"
+        android:layout_height="175dp"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/trofeo"
+        tools:layout_editor_absoluteX="62dp"
+        tools:layout_editor_absoluteY="41dp" />
+
+    <ImageView
+        android:id="@+id/silence"
+        android:layout_width="128dp"
+        android:layout_height="116dp"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/silenciop"
+        tools:layout_editor_absoluteX="141dp"
+        tools:layout_editor_absoluteY="137dp" />
+
+    <ImageView
+        android:id="@+id/imagePoint"
+        android:layout_width="113dp"
+        android:layout_height="125dp"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/star2"
+        tools:layout_editor_absoluteX="239dp"
+        tools:layout_editor_absoluteY="303dp" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="350dp"
+        android:layout_height="139dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.866">
+
+        <TextView
+            android:id="@+id/tiempoPronunciacion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="38dp"
+            android:text="Llevas:"
+            android:gravity="center"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/tiempoDura"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="68dp"
+            android:layout_weight="1"
+            android:text="Debes \n llegar a: "
+            android:gravity="center"
+            android:textSize="25sp" />
+    </LinearLayout>
+
     <Button
         android:id="@+id/btnStartRecognition"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Iniciar Reconocimiento de Voz"
+        android:text="Comenzar"
+        android:layout_marginStart="@dimen/marginExt"
+        android:layout_marginTop="@dimen/marginExt"
+        android:layout_marginEnd="@dimen/marginExt"
+        android:layout_marginBottom="@dimen/marginInt"
+        android:textSize="25sp"
+        android:backgroundTint="@color/blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.247"
@@ -22,6 +152,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/btnStartRecognition"
         android:text="Resultado:"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.403"
@@ -33,117 +164,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tiempo:"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.044"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.446" />
-
-    <TextView
-        android:id="@+id/textVocal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.045"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.337" />
-
-    <LinearLayout
-        android:id="@+id/linearLayout3"
-        android:layout_width="303dp"
-        android:layout_height="257dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.398"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.873">
-
-        <TextView
-            android:id="@+id/tiempoPronunciacion"
-            android:layout_width="92dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_rounded"
-            android:text="Llevas:"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tiempoDura"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Debes llegar a: " />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/puntos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Puntos"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.209"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.188" />
-
-    <ImageView
-        android:id="@+id/imagePoint"
-        android:layout_width="150dp"
-        android:layout_height="236dp"
-        app:srcCompat="@drawable/star2"
-        tools:layout_editor_absoluteX="130dp"
-        tools:layout_editor_absoluteY="94dp" />
-
-    <TextView
-        android:id="@+id/contadorSilencioTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.682"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.188" />
-
-    <TextView
-        android:id="@+id/message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.073" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.484"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.146" />
-
-    <ImageView
-        android:id="@+id/trofeo"
-        android:layout_width="97dp"
-        android:layout_height="175dp"
-        android:visibility="invisible"
-        app:srcCompat="@drawable/trofeo"
-        tools:layout_editor_absoluteX="62dp"
-        tools:layout_editor_absoluteY="41dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

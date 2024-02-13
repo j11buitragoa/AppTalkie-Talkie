@@ -30,15 +30,19 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 
 public class repro_staccato extends AppCompatActivity {
-    private Button comenzar,reproa,intentalo,admin;
+    private Button comenzar,reproa,intentalo,admin,volver;
     private TextView fonema, coincide,silencio;
     private AudioTrack audioTrack;
     private SpeechRecognizer speechRecognizer;
     private boolean isListening = false;
+    private long tiempoInicio;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_repro_staccato);
+        tiempoInicio = System.currentTimeMillis();
+
         Intent intent = getIntent();
         SharedPreferences preferences = getSharedPreferences("Preferences_new", Context.MODE_PRIVATE);
         final String nombreGrabacion = preferences.getString("nombreGrabacion", "");
@@ -54,6 +58,7 @@ public class repro_staccato extends AppCompatActivity {
         silencio=findViewById(R.id.silencio);
         intentalo=findViewById(R.id.intentalo);
         admin=findViewById(R.id.admin);
+        volver=findViewById(R.id.volver);
 
         String textoFonema = "Debes pronunciar: " + fonema1;
         fonema.setText(textoFonema);
@@ -67,6 +72,7 @@ public class repro_staccato extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(repro_staccato.this, confi_dstc.class);
                 startActivity(intent);
+                finish();
             }
         });
         comenzar.setOnClickListener(new View.OnClickListener() {
@@ -74,6 +80,7 @@ public class repro_staccato extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(repro_staccato.this, duracion_staccato.class);
                 startActivity(intent);
+                finish();
             }
         });
         reproa.setOnClickListener(new View.OnClickListener() {
@@ -90,6 +97,13 @@ public class repro_staccato extends AppCompatActivity {
                 } else {
                     stopSpeechRecognition();
                 }
+            }
+        });
+        volver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(repro_staccato.this, Habla_Frame.class);
+                startActivity(intent);
             }
         });
 
@@ -241,5 +255,19 @@ public class repro_staccato extends AppCompatActivity {
                 coincide.setText("No coincidió la pronunciación, intentalo de nuevo");
             }
         }
+    }
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.d("dura_cort", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("dura_cort", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 }

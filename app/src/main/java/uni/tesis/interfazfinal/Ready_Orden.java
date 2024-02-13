@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +26,13 @@ public class Ready_Orden extends AppCompatActivity {
     Button okButton, adminButton;
     String selectLevel;
     Intent goOrden;
+    private long tiempoInicio;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ready_orden);
+        tiempoInicio = System.currentTimeMillis();
 
         okButton = findViewById(R.id.okButton);
         adminButton = findViewById(R.id.adminButton);
@@ -36,6 +40,7 @@ public class Ready_Orden extends AppCompatActivity {
 
         okButton.setOnClickListener(view -> {
             startActivity(goOrden);
+            finish();
         });
 
         adminButton.setOnClickListener(v -> {
@@ -156,5 +161,19 @@ public class Ready_Orden extends AppCompatActivity {
         cancelButton.setOnClickListener(v -> {
             dialog.cancel();
         });
+    }
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.d("Escucha_Frame", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("Escucha_Frame", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 }

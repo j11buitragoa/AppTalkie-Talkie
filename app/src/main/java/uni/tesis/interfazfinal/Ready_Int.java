@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -36,17 +37,21 @@ public class Ready_Int extends AppCompatActivity {
     RingDrawer ringDrawer;
     Intent goIntensidad;
     private int ringWidth, ringSize;
+    private long tiempoInicio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ready_int);
+        tiempoInicio = System.currentTimeMillis();
+
         okButton = findViewById(R.id.okButton);
         adminButton = findViewById(R.id.adminButton);
         goIntensidad = new Intent(this,Habla_Intensidad.class);
 
         okButton.setOnClickListener(view -> {
             startActivity(goIntensidad);
+            finish();
         });
 
         adminButton.setOnClickListener(v -> {
@@ -225,5 +230,19 @@ public class Ready_Int extends AppCompatActivity {
                 surfaceHolder.unlockCanvasAndPost(canvas);
             }
         }
+    }
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.d("Habal_int_adm", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("Habal_int_adm", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 }

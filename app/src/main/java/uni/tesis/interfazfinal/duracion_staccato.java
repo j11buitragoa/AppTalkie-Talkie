@@ -4,6 +4,7 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import android.annotation.SuppressLint;
@@ -50,6 +51,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+
 public class duracion_staccato extends AppCompatActivity {
     private TextView resultTextView, silenceCountTextView, message, puntos;
     private ImageView pato;
@@ -58,13 +60,16 @@ public class duracion_staccato extends AppCompatActivity {
     private boolean conteoEnProgreso = false;
     private List<ImageView> listaPatitos = new ArrayList<>();
     private long startTimeSpeaking;
+    private long startTimeSpeaking2 = 0;
+
     private long lastSpeechEndTime;
     private SpeechRecognizer speechRecognizer;
     private boolean isListening = false;
     private int silenceCount = 0;
+    private int totalsilence=0;
     private int puntosS = 0;
     private ProgressBar progressBar;
-
+    private ImageView silence;
     private long lastVoiceActivityTime = 0;
     private int maxSilence;
     private int intMicBufferSize, intStereoBufferSize;
@@ -85,10 +90,12 @@ public class duracion_staccato extends AppCompatActivity {
     private DocumentReference userDocRef;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private int repeticionestotal=0;
     private FirebaseUser user;
     private final String USERS_COLLECTION = "User";
     private DocumentReference ejercicioDoc;
     private ArrayList<Long> elapsedTimes = new ArrayList<>();
+    long tiempoRespuesta=0;
     private int level;
     private Points points;
     private  final String EJERCICIOS_COLLECTION="Ejercicios";
@@ -100,6 +107,7 @@ public class duracion_staccato extends AppCompatActivity {
         resultTextView = findViewById(R.id.resultTextView);
         Button startSpeechBtn = findViewById(R.id.startSpeechBtn);
         patoContainer = findViewById(R.id.patoContainer);
+        silence=findViewById(R.id.silence);
         listaPatitos = new ArrayList<>();
         silenceCountTextView = findViewById(R.id.silenceCountTextView);
         silenceCountdownTimer = createSilenceCountdownTimer();
@@ -132,6 +140,54 @@ public class duracion_staccato extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                message.setVisibility(View.VISIBLE);
+                message.setText("Pronuncia "+fonema);
+                // Establece las posiciones y dimensiones para text1
+                ConstraintLayout.LayoutParams layoutParams1 = (ConstraintLayout.LayoutParams) puntos.getLayoutParams();
+                layoutParams1.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+                layoutParams1.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+                layoutParams1.leftMargin = 5;  // Ajusta según tus necesidades
+                layoutParams1.topMargin = 40;  // Ajusta según tus necesidades
+                puntos.setLayoutParams(layoutParams1);
+
+                // Establece las posiciones y dimensiones para text2
+                ConstraintLayout.LayoutParams layoutParams3 = (ConstraintLayout.LayoutParams) resultTextView.getLayoutParams();
+                layoutParams3.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+                layoutParams3.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+                layoutParams3.leftMargin = 5;  // Ajusta según tus necesidades
+                layoutParams3.topMargin = 80;  // Ajusta según tus necesidades
+                resultTextView.setLayoutParams(layoutParams3);
+                // Establece las posiciones y dimensiones para text2
+                ConstraintLayout.LayoutParams layoutParams4 = (ConstraintLayout.LayoutParams) message.getLayoutParams();
+                layoutParams4.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+                layoutParams4.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+                layoutParams4.leftMargin = 5;  // Ajusta según tus necesidades
+                layoutParams4.topMargin = 100;  // Ajusta según tus necesidades
+                message.setLayoutParams(layoutParams4);
+
+                //**
+                // Obtén las referencias a las restricciones del TextView
+                ConstraintLayout.LayoutParams layoutParams2 = (ConstraintLayout.LayoutParams) silenceCountTextView.getLayoutParams();
+
+                // Establece las nuevas restricciones de posición (ajusta los valores según tus necesidades)
+                layoutParams2.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID; // o establece la restricción izquierda con respecto a otra vista
+                layoutParams2.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;   // o establece la restricción superior con respecto a otra vista
+                layoutParams2.leftMargin = 5;  // Coordenada X
+                layoutParams2.topMargin = 500;   // Coordenada Y
+
+                // Aplica los nuevos parámetros de diseño al TextView
+                silenceCountTextView.setLayoutParams(layoutParams2);
+
+                // Configura las restricciones para posicionar la ProgressBar (ajusta los valores según tus necesidades)
+                ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) progressBar.getLayoutParams();
+
+                // Establece las restricciones de posición (X, Y)
+                layoutParams.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID; // Puedes ajustar estas restricciones según tus necesidades
+                layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+                layoutParams.leftMargin = 80; // Coordenada X
+                layoutParams.topMargin = 500; // Coordenada Y
+                // Aplica los parámetros de diseño a la ProgressBar
+                progressBar.setLayoutParams(layoutParams);
                 maxSilence = Integer.parseInt(silencio);
                 progressBar.setMax(maxSilence);
                 speechRecognizer = SpeechRecognizer.createSpeechRecognizer(duracion_staccato.this);
@@ -154,7 +210,10 @@ public class duracion_staccato extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!isListening) {
+                    startSpeechBtn.setVisibility(View.INVISIBLE);
+                    tiempoRespuesta=0;
                     isActive = true;
+                    startTimeSpeaking2 = System.currentTimeMillis();
                     //audioThread.start();
                     startSpeechRecognitionOnUiThread();
 
@@ -302,23 +361,22 @@ public class duracion_staccato extends AppCompatActivity {
 
 
         speechRecognizer.startListening(intent);
+
     }
 
     private void stopSpeechRecognition() {
         isListening = false;
-        resultTextView.setText("Detenido.");
+        //resultTextView.setText("Detenido.");
         speechRecognizer.stopListening();
     }
     private class MyRecognitionListener implements RecognitionListener {
         SharedPreferences preferences=getSharedPreferences("Preferences_new", Context.MODE_PRIVATE);
-        String fonema=preferences.getString("fonema","LA");
 
         @Override
         public void onReadyForSpeech(Bundle bundle) {
             Log.d("SpeechRecognizer", "Ready for speech");
             startTimeSpeaking = System.currentTimeMillis();
-            message.setVisibility(View.VISIBLE);
-            message.setText("Pronuncia "+fonema);
+
 
         }
 
@@ -326,10 +384,12 @@ public class duracion_staccato extends AppCompatActivity {
         public void onBeginningOfSpeech() {
             Log.d("SpeechRecognizer", "Beginning of speech");
             // Calcula el tiempo transcurrido desde el inicio hasta aquí
-            long elapsedTime = System.currentTimeMillis() - startTimeSpeaking;
-            Log.d("SpeechRecognizer", "Tiempo hasta comenzar a hablar: " + elapsedTime + " ms");
+            //long elapsedTime = System.currentTimeMillis() - startTimeSpeaking;
+            //Log.d("SpeechRecognizer", "Tiempo hasta comenzar a hablar: " + elapsedTime + " ms");
             lastSpeechEndTime = System.currentTimeMillis();
-            elapsedTimes.add(elapsedTime);
+
+            // elapsedTimes.add(elapsedTime);
+            message.setVisibility(View.GONE);
 
             isSilent = false;
         }
@@ -362,7 +422,7 @@ public class duracion_staccato extends AppCompatActivity {
 
         @Override
         public void onError(int error) {
-            resultTextView.setText("Error en el reconocimiento de voz. Código: " + error);
+            //resultTextView.setText("Error en el reconocimiento de voz. Código: " + error);
             uiHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -374,18 +434,31 @@ public class duracion_staccato extends AppCompatActivity {
 
         @Override
         public void onResults(Bundle results) {
-            updateResultView(results);
-            // Reinicia la escucha para la adquisición continua
-            if (isListening) {
-                startSpeechRecognition();
+            String repeticiones=preferences.getString("repeticiones","5");
+            Integer repeticionest=Integer.parseInt(repeticiones);
+            Integer repeticionestt=repeticionest*2;
+            if (puntosS < repeticionestt && contadorRepeticiones <= repeticionestt) {
+                updateResultView(results);
+
+                Log.d(TAG, "Puntos onresults" + puntosS);
+
+                // Reinicia la escucha para la adquisición continua
+                if (isListening) {
+                    startSpeechRecognition();
+
+                }
 
             }
+
+
 
         }
 
         @Override
         public void onPartialResults(Bundle bundle) {
+
             updateResultView(bundle);
+            Log.d(TAG, "Puntos onpartial" + puntosS);
 
         }
 
@@ -400,14 +473,30 @@ public class duracion_staccato extends AppCompatActivity {
         String fonema=preferences.getString("fonema","LA");
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         if (matches != null && !matches.isEmpty()) {
+            Log.d(TAG, "Puntos update1" + puntosS);
+            String repeticiones=preferences.getString("repeticiones","5");
+            Integer repeticionest=Integer.parseInt(repeticiones);
+            Integer repeticionestt=repeticionest*2;
             String result = matches.get(0);
-            if (result.equalsIgnoreCase(fonema)) {
-                resultTextView.setText("Texto reconocido: " + result);
+            if (result.equalsIgnoreCase(fonema)&& puntosS<=repeticionestt ) {
                 contadorRepeticiones++;
+                repeticionestotal++;
+                Log.d(TAG, "Puntos update2" + puntosS);
+                //resultTextView.setText("Texto reconocido: " + result);
+                long tiempoActual = System.currentTimeMillis();
+
+                tiempoRespuesta = tiempoActual - startTimeSpeaking2;
+                Log.d(TAG, "Tiempo respuesta" + tiempoRespuesta);
+                elapsedTimes.add(tiempoRespuesta);
+
+                tiempoRespuesta =0;
                 puntosS++;
                 puntos.setText(Integer.toString(puntosS));
-                message.setVisibility(View.GONE);
 
+                startTimeSpeaking2 = tiempoActual;
+
+                Log.d(TAG, "Puntos update" + puntosS);
+                message.setVisibility(View.GONE);
                 mostrarImagenesSegunRepeticiones();
 
 
@@ -417,25 +506,36 @@ public class duracion_staccato extends AppCompatActivity {
         }
     }
     private void mostrarImagenesSegunRepeticiones() {
-        SharedPreferences preferences=getSharedPreferences("Preferences_new", Context.MODE_PRIVATE);
-        String repeticiones=preferences.getString("repeticiones","5");
+        SharedPreferences preferences = getSharedPreferences("Preferences_new", Context.MODE_PRIVATE);
+        String repeticiones = preferences.getString("repeticiones", "5");
         String silencio = preferences.getString("silencio", "1");
+        Integer repeticionest = Integer.parseInt(repeticiones);
+        Integer repeticionestt = repeticionest * 2;
+        ConstraintLayout.LayoutParams containerParams = (ConstraintLayout.LayoutParams) patoContainer.getLayoutParams();
+        // Cambiar la posición en el eje X (horizontal)
+        containerParams.leftMargin = 50;  // Ajusta el margen izquierdo según tus necesidades
+
+        // Cambiar la posición en el eje Y (vertical)
+        containerParams.topMargin = 1000;   // Ajusta el margen superior según tus necesidades
+
+        // Aplicar los nuevos parámetros de diseño al contenedor
+        patoContainer.setLayoutParams(containerParams);
+
 
         Log.d("mostrarImagenes", "Mostrando imagen para repeticiones: " + contadorRepeticiones);
-
         // Obtén el ID del recurso de la imagen dinámicamente
         int resourceId = getResources().getIdentifier("pato2", "drawable", getPackageName());
         // Verifica si aún puedes mostrar más patos
-        if (contadorRepeticiones <= Integer.parseInt(repeticiones)) {
-
+        if (contadorRepeticiones <=Integer.parseInt(repeticiones)) {
+            Log.d("mostrarImagenes", "Mostrando imagen para repeticiones2: " + contadorRepeticiones);
             // Crea un nuevo ImageView para cada pato
             ImageView nuevoPato = new ImageView(this);
             // Configura los parámetros de diseño con márgenes y dimensiones proporcionales a la pantalla
             DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
             int screenWidth = displayMetrics.widthPixels;
             int screenHeight = displayMetrics.heightPixels;
-            int patoWidth = screenWidth / 10; // Ajusta según sea necesario
-            int patoHeight = screenHeight / 10; // Ajusta según sea necesario
+            int patoWidth = screenWidth / 5; // Ajusta según sea necesario
+            int patoHeight = screenHeight / 5; // Ajusta según sea necesario
 
             // Configura los parámetros de diseño con márgenes (ajusta estos valores según tus necesidades)
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -446,7 +546,7 @@ public class duracion_staccato extends AppCompatActivity {
             // Ajusta los márgenes para lograr la disposición en forma de escalera ascendente
             //int leftMargin = 50 + (contadorRepeticiones - 1) * 30;  // Ajusta el valor según tus necesidades
             int rightMargin = 100 - (contadorRepeticiones - 1) * 45;  // Ajusta el valor según tus necesidades
-            int topMargin = 0 + (contadorRepeticiones - 1) * 10;   // Ajusta el valor según tus necesidades
+            int topMargin = 0 + (contadorRepeticiones - 1) * 1;   // Ajusta el valor según tus necesidades
 
             layoutParams.setMargins(rightMargin, topMargin, 150, 10);
             nuevoPato.setLayoutParams(layoutParams);
@@ -461,21 +561,23 @@ public class duracion_staccato extends AppCompatActivity {
             resetConteoYBarra();
 
 
-
             // Iniciar el temporizador de silencio solo si el contadorRepeticiones es menor o igual al número de silencio deseado
             if (contadorRepeticiones <= Integer.parseInt(silencio) && !conteoEnProgreso) {
                 startSilenceCountdown();
                 conteoEnProgreso = true;
             }
-
-        }else{
-            stopSpeechRecognition();
-            mostrarImagenEspecial();
-            mostrarResultado();
-            sendDataBase(userDocRef,level);
+            Log.d(TAG, "total" + repeticionestotal);
+            Log.d(TAG, "totals" + totalsilence);
 
 
         }
+
+        else {
+            stopSpeechRecognition();
+
+        }
+
+
     }
     private void startSilenceCountdown() {
         silenceCount = 0;
@@ -490,12 +592,23 @@ public class duracion_staccato extends AppCompatActivity {
         conteoEnProgreso = false;
 
     }
+
+    private void ejecutarMostrarResultadoConDelay(long delayMillis) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mostrarResultado();
+            }
+        }, delayMillis);
+    }
     private void mostrarResultado() {
+        Log.d(TAG, "Bloque else ejecutado mostrar result ");
 
         SharedPreferences preferences=getSharedPreferences("Preferences_new", Context.MODE_PRIVATE);
         String repeticiones=preferences.getString("repeticiones","5");
         Integer repeticionest=Integer.parseInt(repeticiones);
         Integer repeticionestt=repeticionest*2;
+        Log.d("Repeticiones","Rep"+ repeticionestt+repeticionest+repeticiones);
         // Inflar el layout personalizado
         View resultadoView = getLayoutInflater().inflate(R.layout.layout_result, null);
 
@@ -508,7 +621,7 @@ public class duracion_staccato extends AppCompatActivity {
         textResultado.setText("Puntos: " + puntosS);
         textPosibles.setText("Posibles: " +repeticionestt);
         // Lógica para determinar la imagen según la cantidad de puntos
-        if (puntosS >= repeticionestt) {
+        if (puntosS == repeticionestt) {
             // Si obtuvo la mayor cantidad de puntos posibles
             imageResultado.setImageResource(R.drawable.star5);
         } else if (puntosS >= repeticionestt / 2) {
@@ -537,17 +650,26 @@ public class duracion_staccato extends AppCompatActivity {
 
 
     private void mostrarImagenEspecial() {
+        Log.d(TAG, "Bloque else ejecutado trofeo");
+
         // Aquí puedes mostrar la imagen especial, por ejemplo, cambiar la imagen de un ImageView
         ImageView imageView = findViewById(R.id.trofeo);
         // Establecer las dimensiones deseadas (ajusta los valores según tus necesidades)
-        int widthInPixels = 100;  // Ancho en píxeles
-        int heightInPixels = 100; // Altura en píxeles
+        int widthInPixels = 300;  // Ancho en píxeles
+        int heightInPixels = 300; // Altura en píxeles
 
         // Configurar los parámetros de diseño
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 widthInPixels,
                 heightInPixels
         );
+        // Establecer las coordenadas específicas (ajusta los valores según tus necesidades)
+        float xCoord = 400;  // Coordenada X
+        float yCoord = 550;  // Coordenada Y
+
+        // Establecer las coordenadas en el ImageView
+        imageView.setX(xCoord);
+        imageView.setY(yCoord);
 
         // Establecer los parámetros de diseño en el ImageView
         imageView.setLayoutParams(layoutParams);
@@ -564,12 +686,33 @@ public class duracion_staccato extends AppCompatActivity {
     private CountDownTimer createSilenceCountdownTimer() {
         SharedPreferences preferences=getSharedPreferences("Preferences_new", Context.MODE_PRIVATE);
         String silencio=preferences.getString("silencio","1");
+        String repeticiones=preferences.getString("repeticiones","5");
+        String fonema=preferences.getString("fonema","LA");
 
         return new CountDownTimer(Integer.parseInt(silencio) * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 silenceCount++;
+                repeticionestotal++;
                 updateSilenceCountTextView(silenceCount);
+                // Obtén los parámetros de diseño actuales del ConstraintLayout
+                ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) silence.getLayoutParams();
+
+                // Establece las nuevas dimensiones (ancho y alto) en píxeles (ajusta según tus necesidades)
+                layoutParams.width = 200;  // Ancho
+                layoutParams.height = 200; // Alto
+
+                // Establece las nuevas restricciones de posición (izquierda y arriba)
+                layoutParams.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID; // o establece la restricción izquierda con respecto a otra vista
+                layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;   // o establece la restricción superior con respecto a otra vista
+
+                // Establece las nuevas coordenadas (márgenes izquierdo y superior) en píxeles (ajusta según tus necesidades)
+                layoutParams.leftMargin = 300;  // Márgen izquierdo
+                layoutParams.topMargin = 300;   // Márgen superior
+
+                // Aplica los nuevos parámetros de diseño al ConstraintLayout
+                silence.setLayoutParams(layoutParams);
+                silence.setVisibility(View.VISIBLE);
                 // Verifica si la persona está en silencio
                 if (isSilent) {
                     progressBar.incrementProgressBy(1);  // Incrementa la barra de progreso en 1
@@ -579,6 +722,8 @@ public class duracion_staccato extends AppCompatActivity {
                     if (silenceCount == Integer.parseInt(silencio)) {
                         puntosS++;
                         puntos.setText(Integer.toString(puntosS));
+                        Log.d(TAG, "Puntos CountD"+puntosS);
+
                     }
                 }else{
                     message.setVisibility(View.VISIBLE);
@@ -594,8 +739,23 @@ public class duracion_staccato extends AppCompatActivity {
             public void onFinish() {
                 // Se ha alcanzado el valor de silencio, reiniciar el temporizador y mostrar nuevas imágenes
                 silenceCount = 0;
+                silence.setVisibility(View.GONE);
+                totalsilence++;
+                Log.d(TAG,"totalsilence"+totalsilence);
                 conteoEnProgreso = false;
                 progressBar.setProgress(0);
+                message.setVisibility(View.VISIBLE);
+                message.setText("Pronuncia "+fonema);
+                if(contadorRepeticiones == Integer.parseInt(repeticiones)&&totalsilence==Integer.parseInt(repeticiones)) {
+                    Log.d(TAG, "totals2" + totalsilence);
+
+                    Log.d(TAG, "Bloque else ejecutado");
+
+                    stopSpeechRecognition();
+                    mostrarImagenEspecial();
+                    ejecutarMostrarResultadoConDelay(2000);
+                    sendDataBase(userDocRef, level);
+                }
 
             }
         };
@@ -603,7 +763,9 @@ public class duracion_staccato extends AppCompatActivity {
     // Obtén los resultados del reconocimiento de voz
 
     private void updateSilenceCountTextView(int count) {
-        silenceCountTextView.setText("Silence Count: " + count);
+
+
+        silenceCountTextView.setText("Tiempo en\n silencio: " + count);
 
 
     }

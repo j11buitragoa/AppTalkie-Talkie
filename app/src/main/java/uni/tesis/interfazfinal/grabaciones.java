@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
@@ -38,7 +39,9 @@ public class grabaciones extends AppCompatActivity {
     private boolean isPlaying = false;
     private boolean isRecording = false;
     private Thread recordingThread;
-    private Button grabA,grabE,grabI,grabO,grabU,grabar,guardar,eliminar,repro,listo, nuevo;
+    private long tiempoInicio;
+
+    private Button grabA,grabE,grabI,grabO,grabU,grabar,guardar,eliminar,repro,listo, nuevo,backButton;
     private static String fileName = null;
     private String currentButtonLetter;
     @SuppressLint("MissingInflatedId")
@@ -46,6 +49,8 @@ public class grabaciones extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grabaciones);
+        tiempoInicio = System.currentTimeMillis();
+
         grabA = findViewById(R.id.grabA);
         grabE = findViewById(R.id.grabE);
         grabI = findViewById(R.id.grabI);
@@ -57,7 +62,7 @@ public class grabaciones extends AppCompatActivity {
         repro = findViewById(R.id.repro);
         listo= findViewById(R.id.listo);
         nuevo = findViewById(R.id.nuevo);
-
+        backButton = findViewById(R.id.backButton);
 
         grabA.setOnClickListener(v -> {
             setCurrentButtonLetter("a");
@@ -154,6 +159,11 @@ public class grabaciones extends AppCompatActivity {
                 showInputDialog();
 
             }
+        });
+        backButton.setOnClickListener(v -> {
+            Intent goMenu = new Intent(this, MainActivity.class);
+            startActivity(goMenu);
+            finish();
         });
 
     }
@@ -410,6 +420,20 @@ public class grabaciones extends AppCompatActivity {
             editor.putString(currentButtonLetter, fileName);
             editor.apply();
         }
+    }
+    @Override
+    protected void onDestroy() {
+
+        super.onDestroy();
+
+    }
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.d("grab", "onDestroy - Llamado");
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("grab", "onDestroy - Tiempo acumulado: " + tiempoSesionActual);
     }
 
 }

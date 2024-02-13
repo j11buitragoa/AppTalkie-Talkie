@@ -5,10 +5,13 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.icu.util.Calendar;
 import android.media.tv.TvContract;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -33,19 +36,25 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     private Points myApp;
     private TextView valuePoints;
     private String TAG = "TAG";
     private FirebaseAuth mAuth;
+    private static final String PREFS_NAME = "TimeTrackerPrefs";
+    private static final String TOTAL_TIME_KEY = "totalTime";
+    private static final String START_TIME_KEY = "startTime";
     private FirebaseFirestore db;
     private FirebaseUser user,currentUser;
-
+    private long startTime;
     private final String USERS_COLLECTION = "User";
     private DocumentReference userDocRef;
     private Button escuchaButton, hablaButton, vibrometriaButton, addButton;
     private TextView nameTittle;
+    private long tiempoInicio;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         myApp = (Points) getApplication();
         myApp.startSession();
-        myApp=(Points)getApplication();
+        tiempoInicio = System.currentTimeMillis();
+
         valuePoints=findViewById(R.id.valuePoints);
         myApp.addMainActivity("MainActivity",this);
         updatePointsTextView(myApp.getTotalPoints());
@@ -114,10 +124,18 @@ public class MainActivity extends AppCompatActivity {
             startActivity(goAdd);
         });
 
+
+
     }
     @Override
     protected void onPause() {
         super.onPause();
+
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        myApp.endSession();
 
     }
     @Override
@@ -126,25 +144,65 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
         myApp.endSession();
         myApp.removeMainActivity("MainActivity");
+        long tiempoSesionPrincipal = System.currentTimeMillis() - tiempoInicio;
+        Log.d("MainActivity", "onDestroy - Tiempo de actividad principal: " + tiempoSesionPrincipal);
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionPrincipal);
+        Log.d("MainActivity", "onDestroy - Tiempo acumulado antes de guardar: " + TimeT.obtenerTiempoAcumulado(this));
+
+        // Restablecer el tiempo de inicio para la próxima sesión
+        tiempoInicio = System.currentTimeMillis();
+
+        // Limpiar el tiempo acumulado para la próxima sesión
+        TimeT.limpiarTiempoAcumulado(this);
     }
+    private String formatTime(long millis) {
+        if (millis < 0) {
+            return "00:00:00.000";
+        }
+        long totalMillis = millis % 1000;
+        long seconds = millis / 1000;
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+
+        seconds = seconds % 60;
+        minutes = minutes % 60;
+
+        String formattedTime = String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds,totalMillis);
+
+        return formattedTime;
+    }
+
     private void logout() {
+
+        long tiempoSesionActual = System.currentTimeMillis() - tiempoInicio;
+        TimeT.guardarTiempoAcumulado(this, tiempoSesionActual);
+        Log.d("TIEMPO TOTAL", "Tiempo total de uso antes del logout: " + tiempoSesionActual);
+        Log.d("TIEMPO TOTAL", "Total de uso antes del logout: " +formatTime(tiempoSesionActual));
+        Log.d("TIEMPO TOTAL", "Total acumulado: " + formatTime(TimeT.obtenerTiempoAcumulado(this)));
+        String totalAcumulado = formatTime(TimeT.obtenerTiempoAcumulado(this));
+        Log.d("TIEMPO TOTAL", "Total acumulado: " + totalAcumulado);
+
+
+        // Restablecer el tiempo de inicio para la próxima sesión
+        tiempoInicio = System.currentTimeMillis();
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
         //long tiempoTotal = tiempoUsoApp.obtenerTiempoTotal();
         if (currentUser != null) {
-            // Obtén el tiempo total de uso
-            long tiempoTotal = myApp.getTotalAppUsageTime();
-            // Muestra el tiempo total de uso (puedes mostrarlo en un Toast, TextView, Log, etc.)
-            Log.d(TAG, "Tiempo total de uso de la aplicación: " + tiempoTotal);
+
+
+
 
             Map<String, Object> mapa = new HashMap<>();
             myApp.removeMainActivity("MainActivity");
             int puntosGanados = myApp.getTotalPoints(); // Obtener puntos acumulados
 
             mapa.put("puntos_ganados", puntosGanados);
+            mapa.put("total_acumulado", totalAcumulado);
             //mapa.put("tiempo_total", totalTimeInSeconds);
             //String userId = currentUser.getUid();
             DocumentReference docUsers = db.collection(USERS_COLLECTION).document(currentUser.getEmail());
@@ -166,12 +224,15 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG, "Error al obtener la cantidad de intentos", e);
                     });
         }
+        TimeT.limpiarTiempoAcumulado(this);
+
         mAuth.signOut();
 
         Intent intent = new Intent(MainActivity.this, Login.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish(); // Cierra la actividad actual
+
     }
     public void updatePointsTextView(int totalPoints) {
         // Actualizar el contenido del TextView con la puntuación total
