@@ -184,17 +184,26 @@ public class confi_dur_largo extends AppCompatActivity {
                 String dura_time=dur_time.getText().toString();
                 Log.d("Envio",selectedVocal);
 
+                // Todos los campos están llenos, proceder con la lógica actual
+                Log.d("Envio", selectedVocal);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("selectedVocal", selectedVocal);
                 editor.putString("veces", veces_s);
                 editor.putString("silc_time", silc_time);
-                Log.d("ENVIO",silc_time);
+                Log.d("ENVIO", silc_time);
                 editor.putString("dura_time", dura_time);
                 editor.apply();
+                // Verificar si los EditText están llenos
+                if (TextUtils.isEmpty(veces_s) || TextUtils.isEmpty(silc_time) || TextUtils.isEmpty(dura_time)) {
+                    // Mostrar un mensaje o tomar alguna acción para indicar que los campos deben llenarse
+                    Toast.makeText(confi_dur_largo.this, "Todos los campos deben estar llenos", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(confi_dur_largo.this, repro_dur_largo.class);
-                startActivity(intent);
-                finish();
+                } else {
+                    Intent intent = new Intent(confi_dur_largo.this, repro_dur_largo.class);
+                    startActivity(intent);
+                    finish();
+                }
+
             }
         });
 

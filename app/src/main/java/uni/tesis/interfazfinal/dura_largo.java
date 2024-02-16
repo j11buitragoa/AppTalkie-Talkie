@@ -5,6 +5,7 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -36,6 +37,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -149,7 +151,7 @@ public class dura_largo extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         message = findViewById(R.id.message);
         silence = findViewById(R.id.silence);
-        imagePoint.setVisibility(View.INVISIBLE);
+        //imagePoint.setVisibility(View.INVISIBLE);
         silenceCountdownTimer = createSilenceCountdownTimer();
         constraintLayout=findViewById(R.id.dura_largo);
         LinearLayout linearLayout = findViewById(R.id.linearLayout3);
@@ -185,7 +187,7 @@ public class dura_largo extends AppCompatActivity {
         Log.d("SharedPreferencesRecibo", "Silencio: " + silcTime);
         Log.d("SharedPreferencesRecibo", "Duración: " + duraTime);
         Log.d("SharedPreferencesRecibo", "Vocal seleccionada desde SharedPreferences: " + selectedVocal);
-        duraTime = preferences.getString("dura_time", "5");
+        duraTime = preferences.getString("dura_time", "2");
         Log.d(TAG, "silenceTime"+silenceTime);
         durationTimeInMillis=Long.parseLong(duraTime)*1000;
         duration=Integer.parseInt(duraTime);
@@ -221,19 +223,19 @@ public class dura_largo extends AppCompatActivity {
 
         switch (selectedVocal.toLowerCase()) {
             case "a":
-                textVocal.setText("Pronuncia La");
+                textVocal.setText("Pronuncia La\nDurante: " + duraTime + " segundos");
                 break;
             case "e":
-                textVocal.setText("Pronuncia Me");
+                textVocal.setText("Pronuncia Me\nDurante: " + duraTime + " segundos");
                 break;
             case "i":
-                textVocal.setText("Pronuncia Mi");
+                textVocal.setText("Pronuncia Mi\nDurante: " + duraTime + " segundos");;
                 break;
             case "o":
-                textVocal.setText("Pronuncia No");
+                textVocal.setText("Pronuncia No\nDurante: " + duraTime + " segundos");
                 break;
             case "u":
-                textVocal.setText("Pronuncia Su");
+                textVocal.setText("Pronuncia Su\nDurante: " + duraTime + " segundos");
                 break;
         }
         timetext = findViewById(R.id.timetext);
@@ -336,12 +338,14 @@ public class dura_largo extends AppCompatActivity {
 
     private void toggleVoiceRecognition() {
         if (!isListening) {
+
+
             btnStartRecognition.setVisibility(View.INVISIBLE);
             ConstraintLayout.LayoutParams layoutParams1 = (ConstraintLayout.LayoutParams) puntos.getLayoutParams();
             layoutParams1.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
             layoutParams1.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
             layoutParams1.leftMargin = 150;  // Ajusta según tus necesidades
-            layoutParams1.topMargin = 200;  // Ajusta según tus necesidades
+            layoutParams1.topMargin = 500;  // Ajusta según tus necesidades
             puntos.setLayoutParams(layoutParams1);
 
 
@@ -362,8 +366,8 @@ public class dura_largo extends AppCompatActivity {
             ConstraintLayout.LayoutParams layoutParams6 = (ConstraintLayout.LayoutParams) textVocal.getLayoutParams();
             layoutParams6.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
             layoutParams6.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-            layoutParams6.leftMargin = 150;  // Ajusta según tus necesidades
-            layoutParams6.topMargin = 100;  // Ajusta según tus necesidades
+            layoutParams6.leftMargin = 1;  // Ajusta según tus necesidades
+            layoutParams6.topMargin = 80;  // Ajusta según tus necesidades
             textVocal.setLayoutParams(layoutParams6);
             startVoiceRecognition();
             isActive = true;
@@ -657,6 +661,7 @@ public class dura_largo extends AppCompatActivity {
 
 
                         if (imagePoint!= null) {
+
                             imagePoint.setVisibility(View.VISIBLE);
                             startSilenceCountdown();
                         }
@@ -675,7 +680,7 @@ public class dura_largo extends AppCompatActivity {
                     } else if (segundos < duration) {
                         // Restablecer el indicador si el tiempo es inferior a la duración
                         isPuntuacionContada = false;
-                        imagePoint.setVisibility(View.INVISIBLE);
+                        //imagePoint.setVisibility(View.INVISIBLE);
 
                     }
                 } else {

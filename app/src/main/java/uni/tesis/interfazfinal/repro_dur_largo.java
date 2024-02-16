@@ -72,9 +72,10 @@ public class repro_dur_largo extends AppCompatActivity {
 
         SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
         final String fileName = preferences.getString("file_name", "");
-        final String selectedVocal = preferences.getString("selected_vocal", "");
-        final String silencio1 = preferences.getString("silc_time", "");
-        final String duracion1 = preferences.getString("dura_time", "");
+        String selectedVocal = preferences.getString("selectedVocal", "a");
+        String silencio1 = preferences.getString("silc_time", "5");
+        String duracion1 = preferences.getString("dura_time", "2");
+
 
 
         result = findViewById(R.id.result);
@@ -90,30 +91,42 @@ public class repro_dur_largo extends AppCompatActivity {
 
 
         inicializarReconocedorVoz();
+        // Verificar si los valores no están configurados y asignar valores predeterminados
+        if (selectedVocal.isEmpty()) {
+            selectedVocal = "a"; // Valor predeterminado para la vocal
+        }
+
+        if (silencio1.isEmpty()) {
+            silencio1 = "5"; // Valor predeterminado para el tiempo de silencio
+        }
+
+        if (duracion1.isEmpty()) {
+            duracion1 = "2"; // Valor predeterminado para la duración
+        }
         switch (selectedVocal.toLowerCase()) {
             case "a":
-                String textoV = "Debes pronunciar: " + "La "+ "Durante: "+ duracion1+"segundos";
+                String textoV = "Debes pronunciar : " + " La "+ "\nDurante:  "+ duracion1+" segundos";
                 pronunciar.setText(textoV);
                 break;
             case "e":
-                String textoVo = "Debes pronunciar: " + "Me "+ "Durante: "+ duracion1+"segundos";
+                String textoVo = "Debes pronunciar : " + " Me "+ "\nDurante: "+ duracion1+" segundos";
                 pronunciar.setText(textoVo);
                 break;
             case "i":
-                String textoVoc = "Debes pronunciar: " + "Mi "+ "Durante: "+ duracion1+"segundos";
+                String textoVoc = "Debes pronunciar : " + " Mi "+ "\nDurante: "+ duracion1+" segundos";
                 pronunciar.setText(textoVoc);
                 break;
             case "o":
-                String textoVoca = "Debes pronunciar: " + "No "+ "Durante: "+ duracion1+"segundos";
+                String textoVoca = "Debes pronunciar : " + " No "+ "\nDurante: "+ duracion1+" segundos";
                 pronunciar.setText(textoVoca);
                 break;
             case "u":
-                String textoVocal = "Debes pronunciar: " + "Su "+ "Durante: "+ duracion1+"segundos";
+                String textoVocal = "Debes pronunciar : " + " Su "+ "Durante: "+ duracion1+" segundos";
                 pronunciar.setText(textoVocal);
                 break;
         }
 
-        String textosilencio = "Debes mantenerte en silencio: " + silencio1+"segundos entre cada pronunciación";
+        String textosilencio = "Debes mantenerte en silencio:  " + silencio1+" segundos entre \n cada pronunciación";
         silencio.setText(textosilencio);
 
         admin.setOnClickListener(new View.OnClickListener() {
@@ -127,6 +140,28 @@ public class repro_dur_largo extends AppCompatActivity {
         comenzar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+                String fileName = preferences.getString("file_name", "");
+                String selectedVocal = preferences.getString("selectedVocal", "a");
+                String silencio1 = preferences.getString("silc_time", "5");
+                String duracion1 = preferences.getString("dura_time", "2");
+
+                // Verificar si los valores son los predeterminados y actualizar si es necesario
+                if (fileName.isEmpty() || selectedVocal.equals("a") || silencio1.equals("5") || duracion1.equals("2")) {
+                    // Asignar valores predeterminados
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString("file_name", "valor_predeterminado");
+                    editor.putString("selectedVocal", "a");
+                    editor.putString("silc_time", "5");
+                    editor.putString("dura_time", "2");
+                    editor.apply();
+
+                    // Actualizar las variables con los valores predeterminados
+                    fileName = "valor_predeterminado";
+                    selectedVocal = "a";
+                    silencio1 = "5";
+                    duracion1 = "2";
+                }
                 Intent intent = new Intent(repro_dur_largo.this, dura_largo.class);
                 startActivity(intent);
                 finish();
@@ -238,6 +273,7 @@ public class repro_dur_largo extends AppCompatActivity {
     }
     private void toggleVoiceRecognition() {
         if (!isListening) {
+            result.setVisibility(View.VISIBLE);
             startVoiceRecognition();
             isActive = true;
         } else {
@@ -422,7 +458,7 @@ public class repro_dur_largo extends AppCompatActivity {
             uiHandler.post(() -> {
                 if (result != null) {
 
-                    result.setText("Tiempo de pronunciación: " + segundos + " segundos"+"de la vocal "+currentVowel);
+                    result.setText("Tiempo de pronunciación:  " + segundos + "  segundos"+"\n de la vocal  "+ currentVowel);
 
                 } else {
                     Log.e("TiempoPronunciacionError", "tiempoPronunciacion es nulo");

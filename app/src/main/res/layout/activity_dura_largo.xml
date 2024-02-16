@@ -14,7 +14,7 @@
         android:layout_gravity="center"
         android:layout_height="wrap_content"
         android:text=""
-        android:textSize="50sp"
+        android:textSize="40sp"
         android:gravity="center"
         tools:layout_editor_absoluteX="153dp"
         tools:layout_editor_absoluteY="43dp"  />
@@ -26,6 +26,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Puntos: "
+        android:textStyle="bold"
+        android:textColor="@color/blue"
         android:gravity="center"
         android:textSize="25sp"
         tools:layout_editor_absoluteX="25dp"
@@ -88,12 +90,12 @@
 
     <ImageView
         android:id="@+id/imagePoint"
-        android:layout_width="113dp"
-        android:layout_height="125dp"
-        android:visibility="invisible"
+        android:layout_width="91dp"
+        android:layout_height="99dp"
+        android:visibility="visible"
         app:srcCompat="@drawable/star2"
-        tools:layout_editor_absoluteX="239dp"
-        tools:layout_editor_absoluteY="303dp" />
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="207dp" />
 
     <LinearLayout
         android:id="@+id/linearLayout3"
@@ -114,6 +116,7 @@
             android:layout_gravity="center"
             android:layout_marginLeft="38dp"
             android:text="Llevas:"
+            android:textStyle="bold"
             android:gravity="center"
             android:textSize="25sp" />
 
@@ -125,6 +128,7 @@
             android:layout_marginLeft="68dp"
             android:layout_weight="1"
             android:text="Debes \n llegar a: "
+            android:textStyle="bold"
             android:gravity="center"
             android:textSize="25sp" />
     </LinearLayout>
