@@ -413,11 +413,13 @@ public class grabaciones extends AppCompatActivity {
             SharedPreferences preferences = getSharedPreferences("Grabaciones", Context.MODE_PRIVATE);
             Set<String> grabacionesSet = preferences.getStringSet("grabaciones", new HashSet<>());
             grabacionesSet.add(fileName);
+            Log.d(TAG, "guardarNombregrab1: " + fileName);
             preferences.edit().putStringSet("grabaciones", grabacionesSet).apply();
 
             // Aquí guardamos el nombre de la grabación asociado al botón en las preferencias
             SharedPreferences.Editor editor = getSharedPreferences("MyPreferencesGrab", Context.MODE_PRIVATE).edit();
             editor.putString(currentButtonLetter, fileName);
+            Log.d(TAG, "guardarNombregrab: " + fileName);
             editor.apply();
         }
     }

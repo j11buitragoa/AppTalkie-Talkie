@@ -128,21 +128,23 @@
             app:layout_constraintHorizontal_bias="0.105"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <Button
+        <Spinner
             android:id="@+id/listagrab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lista de grabaciones"
             android:layout_marginStart="@dimen/marginExt"
             android:layout_marginTop="@dimen/marginExt"
             android:layout_marginEnd="@dimen/marginExt"
             android:layout_marginBottom="@dimen/marginInt"
             android:textSize="@dimen/sizeTextEscucha"
+            android:gravity="center"
             android:backgroundTint="@color/blue"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.938"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintHorizontal_bias="0.502"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.307"/>
 
         <Button
             android:id="@+id/buttonstart"

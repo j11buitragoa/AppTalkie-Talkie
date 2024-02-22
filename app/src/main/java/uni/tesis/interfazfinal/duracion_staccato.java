@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -27,6 +28,9 @@ import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -140,30 +144,38 @@ public class duracion_staccato extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
+                int colorFonema = ContextCompat.getColor(getApplicationContext(), R.color.purple);
+                String mensaje = "Pronuncia: " + fonema + " corto una vez";
+                Spannable spannable = new SpannableString(mensaje);
+                spannable.setSpan(new ForegroundColorSpan(colorFonema), mensaje.indexOf(fonema), mensaje.indexOf(fonema) + fonema.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                message.setText(spannable);
                 message.setVisibility(View.VISIBLE);
-                message.setText("Pronuncia "+fonema);
+
+                ConstraintLayout.LayoutParams layoutParams6 = (ConstraintLayout.LayoutParams) message.getLayoutParams();
+                layoutParams6.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+                layoutParams6.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+                layoutParams6.leftMargin = 10;  // Ajusta según tus necesidades
+                layoutParams6.topMargin = 100;  // Ajusta según tus necesidades
+                message.setLayoutParams(layoutParams6);
+
+
                 // Establece las posiciones y dimensiones para text1
                 ConstraintLayout.LayoutParams layoutParams1 = (ConstraintLayout.LayoutParams) puntos.getLayoutParams();
                 layoutParams1.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
                 layoutParams1.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-                layoutParams1.leftMargin = 5;  // Ajusta según tus necesidades
-                layoutParams1.topMargin = 40;  // Ajusta según tus necesidades
+                layoutParams1.leftMargin = 50;  // Ajusta según tus necesidades
+                layoutParams1.topMargin = 30;  // Ajusta según tus necesidades
                 puntos.setLayoutParams(layoutParams1);
 
                 // Establece las posiciones y dimensiones para text2
                 ConstraintLayout.LayoutParams layoutParams3 = (ConstraintLayout.LayoutParams) resultTextView.getLayoutParams();
                 layoutParams3.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
                 layoutParams3.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-                layoutParams3.leftMargin = 5;  // Ajusta según tus necesidades
-                layoutParams3.topMargin = 80;  // Ajusta según tus necesidades
+                layoutParams3.leftMargin = 80;  // Ajusta según tus necesidades
+                layoutParams3.topMargin = 450;  // Ajusta según tus necesidades
                 resultTextView.setLayoutParams(layoutParams3);
-                // Establece las posiciones y dimensiones para text2
-                ConstraintLayout.LayoutParams layoutParams4 = (ConstraintLayout.LayoutParams) message.getLayoutParams();
-                layoutParams4.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
-                layoutParams4.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-                layoutParams4.leftMargin = 5;  // Ajusta según tus necesidades
-                layoutParams4.topMargin = 100;  // Ajusta según tus necesidades
-                message.setLayoutParams(layoutParams4);
+
 
                 //**
                 // Obtén las referencias a las restricciones del TextView
@@ -172,8 +184,8 @@ public class duracion_staccato extends AppCompatActivity {
                 // Establece las nuevas restricciones de posición (ajusta los valores según tus necesidades)
                 layoutParams2.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID; // o establece la restricción izquierda con respecto a otra vista
                 layoutParams2.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;   // o establece la restricción superior con respecto a otra vista
-                layoutParams2.leftMargin = 5;  // Coordenada X
-                layoutParams2.topMargin = 500;   // Coordenada Y
+                layoutParams2.leftMargin = 80;  // Coordenada X
+                layoutParams2.topMargin = 520;   // Coordenada Y
 
                 // Aplica los nuevos parámetros de diseño al TextView
                 silenceCountTextView.setLayoutParams(layoutParams2);
@@ -184,8 +196,8 @@ public class duracion_staccato extends AppCompatActivity {
                 // Establece las restricciones de posición (X, Y)
                 layoutParams.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID; // Puedes ajustar estas restricciones según tus necesidades
                 layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-                layoutParams.leftMargin = 80; // Coordenada X
-                layoutParams.topMargin = 500; // Coordenada Y
+                layoutParams.leftMargin = 1; // Coordenada X
+                layoutParams.topMargin = 580; // Coordenada Y
                 // Aplica los parámetros de diseño a la ProgressBar
                 progressBar.setLayoutParams(layoutParams);
                 maxSilence = Integer.parseInt(silencio);
@@ -491,18 +503,23 @@ public class duracion_staccato extends AppCompatActivity {
 
                 tiempoRespuesta =0;
                 puntosS++;
-                puntos.setText(Integer.toString(puntosS));
+                puntos.setText("Puntos: " + Integer.toString(puntosS));
 
                 startTimeSpeaking2 = tiempoActual;
 
                 Log.d(TAG, "Puntos update" + puntosS);
+                resultTextView.setVisibility(View.GONE);
                 message.setVisibility(View.GONE);
                 mostrarImagenesSegunRepeticiones();
 
 
             } else {
                 resultTextView.setText("No coincidió con el fonema.");
+                resultTextView.setVisibility(View.VISIBLE);
+
+
             }
+
         }
     }
     private void mostrarImagenesSegunRepeticiones() {
@@ -616,20 +633,51 @@ public class duracion_staccato extends AppCompatActivity {
         TextView textResultado = resultadoView.findViewById(R.id.puntostt);
         TextView textPosibles = resultadoView.findViewById(R.id.puntospos);
         ImageView imageResultado = resultadoView.findViewById(R.id.imageView);
+        TextView textMessage = resultadoView.findViewById(R.id.textMessage);
+        LinearLayout.LayoutParams layoutParamsTextResultado = (LinearLayout.LayoutParams) textResultado.getLayoutParams();
+        layoutParamsTextResultado.leftMargin = 20;  // Ajusta la coordenada X
+        layoutParamsTextResultado.topMargin = 15;  // Ajusta la coordenada Y
+        textResultado.setLayoutParams(layoutParamsTextResultado);
 
+        LinearLayout.LayoutParams layoutParamsTextResultado2 = (LinearLayout.LayoutParams) textPosibles.getLayoutParams();
+        layoutParamsTextResultado2.leftMargin = 20;  // Ajusta la coordenada X
+        layoutParamsTextResultado2.topMargin = 1;  // Ajusta la coordenada Y
+        textPosibles.setLayoutParams(layoutParamsTextResultado2);
+
+        LinearLayout.LayoutParams layoutParamsTextResultado3 = (LinearLayout.LayoutParams) textMessage.getLayoutParams();
+        layoutParamsTextResultado3.leftMargin = 50;  // Ajusta la coordenada X
+        layoutParamsTextResultado3.topMargin = 0;  // Ajusta la coordenada Y
+        textMessage.setLayoutParams(layoutParamsTextResultado3);
+
+        LinearLayout.LayoutParams layoutParamsImage = (LinearLayout.LayoutParams) imageResultado.getLayoutParams();
+        layoutParamsImage.leftMargin = 50;  // Ajusta la coordenada X
+        layoutParamsImage.topMargin = 1;  // Ajusta la coordenada Y
         // Establecer el número de puntos en el TextView (ajusta esto según tu lógica)
-        textResultado.setText("Puntos: " + puntosS);
-        textPosibles.setText("Posibles: " +repeticionestt);
+        textResultado.setText("Puntos Obtenidos: " + puntosS);
+        textPosibles.setText("Puntos Posibles: " +repeticionestt);
         // Lógica para determinar la imagen según la cantidad de puntos
         if (puntosS == repeticionestt) {
             // Si obtuvo la mayor cantidad de puntos posibles
             imageResultado.setImageResource(R.drawable.star5);
+            textMessage.setText("Muy bien completaste el ejercicio correctamente");
+            layoutParamsImage.width = 400;  // Ajusta el ancho según tus necesidades
+            layoutParamsImage.height = 200;
+            imageResultado.setLayoutParams(layoutParamsImage);
+
         } else if (puntosS >= repeticionestt / 2) {
             // Si obtuvo al menos la mitad de los puntos posibles
             imageResultado.setImageResource(R.drawable.star3);
+            textMessage.setText("Por poco  \n ¡Intentemoslo de nuevo y consigamos\n 5 estrellas!");
+            layoutParamsImage.width = 500;  // Ajusta el ancho según tus necesidades
+            layoutParamsImage.height = 300;
+            imageResultado.setLayoutParams(layoutParamsImage);
         } else {
             // Si obtuvo menos de la mitad de los puntos posibles
             imageResultado.setImageResource(R.drawable.star1);
+            textMessage.setText("Podemos hacerlo mejor \n ¡Intentemoslo de nuevo!");
+            layoutParamsImage.width = 600;  // Ajusta el ancho según tus necesidades
+            layoutParamsImage.height = 500;
+            imageResultado.setLayoutParams(layoutParamsImage);
         }
 
 
@@ -655,24 +703,20 @@ public class duracion_staccato extends AppCompatActivity {
         // Aquí puedes mostrar la imagen especial, por ejemplo, cambiar la imagen de un ImageView
         ImageView imageView = findViewById(R.id.trofeo);
         // Establecer las dimensiones deseadas (ajusta los valores según tus necesidades)
-        int widthInPixels = 300;  // Ancho en píxeles
-        int heightInPixels = 300; // Altura en píxeles
+        int widthInPixels = 400;  // Ancho en píxeles
+        int heightInPixels = 400; // Altura en píxeles
 
-        // Configurar los parámetros de diseño
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                widthInPixels,
-                heightInPixels
-        );
-        // Establecer las coordenadas específicas (ajusta los valores según tus necesidades)
-        float xCoord = 400;  // Coordenada X
-        float yCoord = 550;  // Coordenada Y
 
-        // Establecer las coordenadas en el ImageView
-        imageView.setX(xCoord);
-        imageView.setY(yCoord);
 
+        ConstraintLayout.LayoutParams layoutParams11 = (ConstraintLayout.LayoutParams) imageView.getLayoutParams();
+        layoutParams11.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams11.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams11.leftMargin = 100;  // Ajusta según tus necesidades
+        layoutParams11.topMargin = 400;  // Ajusta según tus necesidades
+        layoutParams11.width = widthInPixels;
+        layoutParams11.height = heightInPixels;
         // Establecer los parámetros de diseño en el ImageView
-        imageView.setLayoutParams(layoutParams);
+        imageView.setLayoutParams(layoutParams11);
         imageView.setImageResource(R.drawable.trofeo);
         addPoints(puntosS);
         imageView.setVisibility(View.VISIBLE);;
@@ -707,8 +751,8 @@ public class duracion_staccato extends AppCompatActivity {
                 layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;   // o establece la restricción superior con respecto a otra vista
 
                 // Establece las nuevas coordenadas (márgenes izquierdo y superior) en píxeles (ajusta según tus necesidades)
-                layoutParams.leftMargin = 300;  // Márgen izquierdo
-                layoutParams.topMargin = 300;   // Márgen superior
+                layoutParams.leftMargin = 200;  // Márgen izquierdo
+                layoutParams.topMargin = 320;   // Márgen superior
 
                 // Aplica los nuevos parámetros de diseño al ConstraintLayout
                 silence.setLayoutParams(layoutParams);
@@ -721,7 +765,7 @@ public class duracion_staccato extends AppCompatActivity {
                     message.setVisibility(View.GONE);
                     if (silenceCount == Integer.parseInt(silencio)) {
                         puntosS++;
-                        puntos.setText(Integer.toString(puntosS));
+                        puntos.setText("Puntos: "+ Integer.toString(puntosS));
                         Log.d(TAG, "Puntos CountD"+puntosS);
 
                     }
@@ -744,8 +788,12 @@ public class duracion_staccato extends AppCompatActivity {
                 Log.d(TAG,"totalsilence"+totalsilence);
                 conteoEnProgreso = false;
                 progressBar.setProgress(0);
+                int colorFonema = ContextCompat.getColor(getApplicationContext(), R.color.purple);
+                String mensaje = "Pronuncia: " + fonema + " corto una vez";
+                Spannable spannable = new SpannableString(mensaje);
+                spannable.setSpan(new ForegroundColorSpan(colorFonema), mensaje.indexOf(fonema), mensaje.indexOf(fonema) + fonema.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                message.setText(spannable);
                 message.setVisibility(View.VISIBLE);
-                message.setText("Pronuncia "+fonema);
                 if(contadorRepeticiones == Integer.parseInt(repeticiones)&&totalsilence==Integer.parseInt(repeticiones)) {
                     Log.d(TAG, "totals2" + totalsilence);
 
@@ -753,7 +801,7 @@ public class duracion_staccato extends AppCompatActivity {
 
                     stopSpeechRecognition();
                     mostrarImagenEspecial();
-                    ejecutarMostrarResultadoConDelay(2000);
+                    ejecutarMostrarResultadoConDelay(3000);
                     sendDataBase(userDocRef, level);
                 }
 
@@ -763,9 +811,13 @@ public class duracion_staccato extends AppCompatActivity {
     // Obtén los resultados del reconocimiento de voz
 
     private void updateSilenceCountTextView(int count) {
+        String textoCompleto = "Tiempo en silencio: " + count + "  segundos";
+        SpannableString spannableString = new SpannableString(textoCompleto);
+        int inicioCount = textoCompleto.indexOf(String.valueOf(count));
+        int finCount = inicioCount + String.valueOf(count).length();
+        spannableString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.yellow)), inicioCount, finCount, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-
-        silenceCountTextView.setText("Tiempo en\n silencio: " + count);
+        silenceCountTextView.setText(spannableString);
 
 
     }

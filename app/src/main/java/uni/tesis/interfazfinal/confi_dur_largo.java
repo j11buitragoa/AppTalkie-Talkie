@@ -1,11 +1,16 @@
 package uni.tesis.interfazfinal;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -21,30 +26,39 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class confi_dur_largo extends AppCompatActivity {
     private Handler handler = new Handler();
-    private Button buttonstart,listagrab,tono;
-    private Spinner spinner_voc;
+    private Button buttonstart;
+    private Spinner spinner_voc,listagrab;
     private EditText sil_time,dur_time,veces;
     private long tiempoInicio;
+    private String nombreGrabacionSeleccionada;
+    private AudioTrack audioTrack;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confi_dur_largo);
         tiempoInicio = System.currentTimeMillis();
-
+        listagrab =  findViewById(R.id.listagrab);
         spinner_voc=findViewById(R.id.spinner_voc);
         buttonstart=findViewById(R.id.buttonstart);
         sil_time=findViewById(R.id.sil_time);
-        listagrab=findViewById(R.id.listagrab);
-        tono=findViewById(R.id.tonos);
         dur_time=findViewById(R.id.dur_time);
         veces=findViewById(R.id.veces);
+        cargarListaGrabaciones();
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
@@ -177,112 +191,116 @@ public class confi_dur_largo extends AppCompatActivity {
         buttonstart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
-                String selectedVocal = preferences.getString("selectedVocal", "LA");
-                String veces_s=veces.getText().toString();
-                String silc_time=sil_time.getText().toString();
-                String dura_time=dur_time.getText().toString();
-                Log.d("Envio",selectedVocal);
+                if (nombreGrabacionSeleccionada != null && !nombreGrabacionSeleccionada.isEmpty()) {
 
-                // Todos los campos están llenos, proceder con la lógica actual
-                Log.d("Envio", selectedVocal);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("selectedVocal", selectedVocal);
-                editor.putString("veces", veces_s);
-                editor.putString("silc_time", silc_time);
-                Log.d("ENVIO", silc_time);
-                editor.putString("dura_time", dura_time);
-                editor.apply();
-                // Verificar si los EditText están llenos
-                if (TextUtils.isEmpty(veces_s) || TextUtils.isEmpty(silc_time) || TextUtils.isEmpty(dura_time)) {
-                    // Mostrar un mensaje o tomar alguna acción para indicar que los campos deben llenarse
-                    Toast.makeText(confi_dur_largo.this, "Todos los campos deben estar llenos", Toast.LENGTH_SHORT).show();
+                    SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+                    String selectedVocal = preferences.getString("selectedVocal", "LA");
+                    String veces_s = veces.getText().toString();
+                    String silc_time = sil_time.getText().toString();
+                    String dura_time = dur_time.getText().toString();
+                    Log.d("Envio", selectedVocal);
 
-                } else {
-                    Intent intent = new Intent(confi_dur_largo.this, repro_dur_largo.class);
-                    startActivity(intent);
-                    finish();
+                    // Todos los campos están llenos, proceder con la lógica actual
+                    Log.d("Envio", selectedVocal);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString("selectedVocal", selectedVocal);
+                    editor.putString("veces", veces_s);
+                    editor.putString("nombreGrabacion", nombreGrabacionSeleccionada);
+                    editor.putString("silc_time", silc_time);
+                    Log.d("ENVIO", silc_time);
+                    editor.putString("dura_time", dura_time);
+                    editor.apply();
+                    // Verificar si los EditText están llenos
+                    if (TextUtils.isEmpty(veces_s) || TextUtils.isEmpty(silc_time) || TextUtils.isEmpty(dura_time)) {
+                        // Mostrar un mensaje o tomar alguna acción para indicar que los campos deben llenarse
+                        Toast.makeText(confi_dur_largo.this, "Todos los campos deben estar llenos", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Intent intent = new Intent(confi_dur_largo.this, repro_dur_largo.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }else {
+                    // Si no se ha seleccionado una grabación, mostrar un mensaje al usuario
+                    Toast.makeText(confi_dur_largo.this, "Por favor, seleccione una grabación", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
 
-        listagrab.setOnClickListener(new View.OnClickListener() {
+        listagrab.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+
             @Override
-            public void onClick(View view) {
-                mostrarListaGrabaciones();
+            public void onItemSelected(AdapterView<?> parentView, View view, int i, long l) {
+                nombreGrabacionSeleccionada = parentView.getItemAtPosition(i).toString();
+                Log.d(TAG, "Nombre de grabación seleccionada: " + nombreGrabacionSeleccionada);
+                reproducirGrabacion(nombreGrabacionSeleccionada);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
         });
 
     }
-    private void mostrarListaGrabaciones() {
-        // Obtener la lista de grabaciones (de alguna manera, por ejemplo, desde el sistema de archivos)
-        List<GrabacionModel> grabaciones = obtenerListaDeGrabaciones();
+    private void cargarListaGrabaciones() {
+        SharedPreferences preferences = getSharedPreferences("Grabaciones", Context.MODE_PRIVATE);
+        Set<String> grabacionesSet = preferences.getStringSet("grabaciones", new HashSet<>());
+        List<String> grabacionesList = new ArrayList<>(grabacionesSet);
 
-        // Crear un adaptador para el ListView
-        GrabacionAdapter adapter = new GrabacionAdapter(this, grabaciones);
-
-        // Crear y configurar el diálogo
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Lista de Grabaciones");
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_grabaciones, null);
-        builder.setView(dialogView);
-
-        ListView listViewGrabaciones = dialogView.findViewById(R.id.listViewGrabacionesDialog);
-        listViewGrabaciones.setAdapter(adapter);
-
-        // Asignar un OnItemClickListener al ListView
-        listViewGrabaciones.setOnItemClickListener((parent, view, position, id) -> {
-            // Manejar la selección del elemento de la lista
-            GrabacionModel grabacionSeleccionada = adapter.getItem(position);
-            if (grabacionSeleccionada != null) {
-                // Aquí puedes cargar y reproducir la grabación seleccionada
-                String nombreGrabacion = grabacionSeleccionada.getNombre();
-
-            }
-        });
-
-        builder.setPositiveButton("Cerrar", (dialog, which) -> dialog.dismiss());
-
-        // Mostrar el diálogo
-        builder.create().show();
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, grabacionesList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        listagrab.setAdapter(adapter);
     }
-    private List<GrabacionModel> obtenerListaDeGrabaciones() {
-        List<GrabacionModel> grabaciones = new ArrayList<>();
-        String directorioGrabaciones = getExternalCacheDir().getAbsolutePath();
-
-        // Aquí deberías obtener la lista de archivos de grabaciones en tu directorio específico
-        File directorio = new File(directorioGrabaciones);
-
-        if (!directorio.exists() || !directorio.isDirectory()) {
-            // Crea el directorio si no existe
-            if (directorio.mkdirs()) {
-                Log.d("Archivo", "Directorio creado con éxito");
-            } else {
-                Log.e("Archivo", "Error al crear el directorio");
-                return grabaciones;
-            }
+    private void reproducirGrabacion(String nombreGrabacion) {
+        if (audioTrack != null) {
+            audioTrack.stop();
+            audioTrack.release();
+            audioTrack = null;
         }
+        final int bufferSize = AudioTrack.getMinBufferSize(
+                44100,
+                AudioFormat.CHANNEL_OUT_MONO,
+                AudioFormat.ENCODING_PCM_16BIT);
 
-        File[] archivos = directorio.listFiles();
-        if (archivos != null) {
-            for (File archivo : archivos) {
-                // Obtener solo el nombre del archivo sin la extensión
-                String nombreGrabacion = archivo.getName().replaceFirst("[.][^.]+$", "");
+        audioTrack = new AudioTrack(
+                AudioManager.STREAM_MUSIC,
+                44100,
+                AudioFormat.CHANNEL_OUT_MONO,
+                AudioFormat.ENCODING_PCM_16BIT,
+                bufferSize,
+                AudioTrack.MODE_STREAM);
 
-                // Agregar log
-                Log.d("Archivo", "Nombre de grabación encontrado: " + nombreGrabacion);
+        try {
+            // Simplificamos la construcción de la ruta del archivo
+            File file = new File(nombreGrabacion);
 
-                // Agregar cada archivo como una grabación al modelo
-                grabaciones.add(new GrabacionModel(nombreGrabacion));
+            if (!file.exists()) {
+                Log.e(TAG, "El archivo no existe: " + file.getAbsolutePath());
+                return;
             }
-        } else {
-            Log.d("Archivo", "No se encontraron archivos en el directorio");
-        }
 
-        return grabaciones;
+            FileInputStream fileInputStream = new FileInputStream(file);
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+            DataInputStream dataInputStream = new DataInputStream(bufferedInputStream);
+
+            audioTrack.play();
+
+            byte[] buffer = new byte[bufferSize];
+            int bytesRead;
+
+            while ((bytesRead = dataInputStream.read(buffer)) > 0) {
+                audioTrack.write(buffer, 0, bytesRead);
+            }
+
+            dataInputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+
     @Override
     protected void onDestroy() {
 

@@ -71,10 +71,10 @@ public class repro_dur_largo extends AppCompatActivity {
         tiempoInicio = System.currentTimeMillis();
 
         SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
-        final String fileName = preferences.getString("file_name", "");
         String selectedVocal = preferences.getString("selectedVocal", "a");
         String silencio1 = preferences.getString("silc_time", "5");
         String duracion1 = preferences.getString("dura_time", "2");
+        String nombreGrabacion = preferences.getString("nombreGrabacion", "");
 
 
 
@@ -141,26 +141,20 @@ public class repro_dur_largo extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
-                String fileName = preferences.getString("file_name", "");
+                final String nombreGrabacion = preferences.getString("nombreGrabacion", "");
                 String selectedVocal = preferences.getString("selectedVocal", "a");
                 String silencio1 = preferences.getString("silc_time", "5");
                 String duracion1 = preferences.getString("dura_time", "2");
 
                 // Verificar si los valores son los predeterminados y actualizar si es necesario
-                if (fileName.isEmpty() || selectedVocal.equals("a") || silencio1.equals("5") || duracion1.equals("2")) {
+                if ( selectedVocal.isEmpty() | silencio1.isEmpty() || duracion1.isEmpty()) {
                     // Asignar valores predeterminados
                     SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("file_name", "valor_predeterminado");
                     editor.putString("selectedVocal", "a");
                     editor.putString("silc_time", "5");
                     editor.putString("dura_time", "2");
                     editor.apply();
 
-                    // Actualizar las variables con los valores predeterminados
-                    fileName = "valor_predeterminado";
-                    selectedVocal = "a";
-                    silencio1 = "5";
-                    duracion1 = "2";
                 }
                 Intent intent = new Intent(repro_dur_largo.this, dura_largo.class);
                 startActivity(intent);
@@ -170,7 +164,7 @@ public class repro_dur_largo extends AppCompatActivity {
         reproducir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reproducirGrabacion(fileName);
+                reproducirGrabacion(nombreGrabacion);
             }
         });
         intentalo.setOnClickListener(new View.OnClickListener() {

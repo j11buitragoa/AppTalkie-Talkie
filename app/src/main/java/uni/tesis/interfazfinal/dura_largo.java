@@ -32,6 +32,7 @@ import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -143,15 +144,15 @@ public class dura_largo extends AppCompatActivity {
         btnStartRecognition = findViewById(R.id.btnStartRecognition);
         tvResult = findViewById(R.id.tvResult);
         textVocal = findViewById(R.id.textVocal);
+        imagePoint = findViewById(R.id.imagePoint);
         contadorSilencioTextView = findViewById(R.id.contadorSilencioTextView);
         tiempoPronunciacion = findViewById(R.id.tiempoPronunciacion);
         tiempoDura = findViewById(R.id.tiempoDura);
         puntos = findViewById(R.id.puntos);
-        imagePoint = findViewById(R.id.imagePoint);
         progressBar = findViewById(R.id.progressBar);
         message = findViewById(R.id.message);
         silence = findViewById(R.id.silence);
-        //imagePoint.setVisibility(View.INVISIBLE);
+        imagePoint.setVisibility(View.INVISIBLE);
         silenceCountdownTimer = createSilenceCountdownTimer();
         constraintLayout=findViewById(R.id.dura_largo);
         LinearLayout linearLayout = findViewById(R.id.linearLayout3);
@@ -192,15 +193,13 @@ public class dura_largo extends AppCompatActivity {
         durationTimeInMillis=Long.parseLong(duraTime)*1000;
         duration=Integer.parseInt(duraTime);
 
-        // Configura las restricciones para posicionar la ProgressBar (ajusta los valores según tus necesidades)
         ConstraintLayout.LayoutParams layoutParams7 = (ConstraintLayout.LayoutParams) progressBar.getLayoutParams();
 
-        // Establece las restricciones de posición (X, Y)
         layoutParams7.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID; // Puedes ajustar estas restricciones según tus necesidades
         layoutParams7.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-        layoutParams7.leftMargin = 5; // Coordenada X
-        layoutParams7.topMargin = 800; // Coordenada Y
-        // Aplica los parámetros de diseño a la ProgressBar
+        layoutParams7.leftMargin = 1; // Coordenada X
+        layoutParams7.rightMargin = 1; // Coordenada X
+        layoutParams7.topMargin = 750; // Coordenada Y
         progressBar.setLayoutParams(layoutParams7);
         maxSilence = Integer.parseInt(silcTime);
         progressBar.setMax(maxSilence);
@@ -221,23 +220,83 @@ public class dura_largo extends AppCompatActivity {
             }
         });
 
+        String textoCompleto = "Pronuncia La\nDurante: " + duraTime + " segundos";
+        SpannableString spannableString = new SpannableString(textoCompleto);
+        int inicioLa = textoCompleto.indexOf("La");
+        int finLa = inicioLa + "La".length();
+        spannableString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.purple)), inicioLa, finLa, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        int inicioDuraTime = textoCompleto.indexOf(duraTime);
+        int finDuraTime = inicioDuraTime + duraTime.length();
+        spannableString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.blue)), inicioDuraTime, finDuraTime, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+
+        String textoCompleto2 = "Pronuncia Me\nDurante: " + duraTime + " segundos";
+        SpannableString spannableString2 = new SpannableString(textoCompleto2);
+        int inicioMe = textoCompleto2.indexOf("Me");
+        int finMe = inicioMe + "Me".length();
+        spannableString2.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.purple)), inicioMe, finMe, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        int inicioDuraTime2 = textoCompleto2.indexOf(duraTime);
+        int finDuraTime2 = inicioDuraTime2 + duraTime.length();
+        spannableString2.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.blue)), inicioDuraTime2, finDuraTime2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        String textoCompleto3 = "Pronuncia Mi\nDurante: " + duraTime + " segundos";
+        SpannableString spannableString3 = new SpannableString(textoCompleto3);
+        int inicioMi = textoCompleto3.indexOf("Mi");
+        int finMi = inicioMi + "Mi".length();
+        spannableString3.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.purple)), inicioMi, finMi, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        int inicioDuraTime3 = textoCompleto3.indexOf(duraTime);
+        int finDuraTime3 = inicioDuraTime3 + duraTime.length();
+        spannableString3.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.blue)), inicioDuraTime3, finDuraTime3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        String textoCompleto4 = "Pronuncia No\nDurante: " + duraTime + " segundos";
+        SpannableString spannableString4 = new SpannableString(textoCompleto4);
+        int inicioNo = textoCompleto4.indexOf("No");
+        int finNo = inicioNo + "No".length();
+        spannableString4.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.purple)), inicioNo, finNo, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        int inicioDuraTime4 = textoCompleto4.indexOf(duraTime);
+        int finDuraTime4 = inicioDuraTime4 + duraTime.length();
+        spannableString4.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.blue)), inicioDuraTime4, finDuraTime4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        String textoCompleto5 = "Pronuncia Su\nDurante: " + duraTime + " segundos";
+        SpannableString spannableString5 = new SpannableString(textoCompleto5);
+        int inicioSu = textoCompleto5.indexOf("Su");
+        int finSu = inicioSu + "Su".length();
+        spannableString5.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.purple)), inicioSu, finSu, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        int inicioDuraTime5 = textoCompleto5.indexOf(duraTime);
+        int finDuraTime5 = inicioDuraTime5 + duraTime.length();
+        spannableString5.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.blue)), inicioDuraTime5, finDuraTime5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        ConstraintLayout.LayoutParams layoutParams6 = (ConstraintLayout.LayoutParams) textVocal.getLayoutParams();
+        layoutParams6.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams6.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams6.leftMargin = 30;  // Ajusta según tus necesidades
+        layoutParams6.topMargin = 120;  // Ajusta según tus necesidades
+        textVocal.setLayoutParams(layoutParams6);
+
         switch (selectedVocal.toLowerCase()) {
             case "a":
-                textVocal.setText("Pronuncia La\nDurante: " + duraTime + " segundos");
+                textVocal.setText(spannableString);
                 break;
             case "e":
-                textVocal.setText("Pronuncia Me\nDurante: " + duraTime + " segundos");
+                textVocal.setText(spannableString2);
                 break;
             case "i":
-                textVocal.setText("Pronuncia Mi\nDurante: " + duraTime + " segundos");;
+                textVocal.setText(spannableString3);;
                 break;
             case "o":
-                textVocal.setText("Pronuncia No\nDurante: " + duraTime + " segundos");
+                textVocal.setText(spannableString4);
                 break;
             case "u":
-                textVocal.setText("Pronuncia Su\nDurante: " + duraTime + " segundos");
+                textVocal.setText(spannableString5);
                 break;
         }
+        ConstraintLayout.LayoutParams layoutParams1 = (ConstraintLayout.LayoutParams) puntos.getLayoutParams();
+        layoutParams1.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams1.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams1.leftMargin = 50;  // Ajusta según tus necesidades
+        layoutParams1.topMargin = 30;  // Ajusta según tus necesidades
+        puntos.setLayoutParams(layoutParams1);
+
         timetext = findViewById(R.id.timetext);
         verificarPermisos();
         inicializarReconocedorVoz();
@@ -341,34 +400,24 @@ public class dura_largo extends AppCompatActivity {
 
 
             btnStartRecognition.setVisibility(View.INVISIBLE);
-            ConstraintLayout.LayoutParams layoutParams1 = (ConstraintLayout.LayoutParams) puntos.getLayoutParams();
-            layoutParams1.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
-            layoutParams1.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-            layoutParams1.leftMargin = 150;  // Ajusta según tus necesidades
-            layoutParams1.topMargin = 500;  // Ajusta según tus necesidades
-            puntos.setLayoutParams(layoutParams1);
 
-
+            int colorAmarillo = ContextCompat.getColor(this, R.color.red);
             ConstraintLayout.LayoutParams layoutParams4 = (ConstraintLayout.LayoutParams) message.getLayoutParams();
             layoutParams4.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
             layoutParams4.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-            layoutParams4.leftMargin = 150;  // Ajusta según tus necesidades
-            layoutParams4.topMargin = 500;  // Ajusta según tus necesidades
+            layoutParams4.leftMargin = 5;  // Ajusta según tus necesidades
+            layoutParams4.topMargin = 560;  // Ajusta según tus necesidades
+            message.setTextColor(colorAmarillo);
             message.setLayoutParams(layoutParams4);
 
             ConstraintLayout.LayoutParams layoutParams5 = (ConstraintLayout.LayoutParams) contadorSilencioTextView.getLayoutParams();
             layoutParams5.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
             layoutParams5.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-            layoutParams5.leftMargin = 150;  // Ajusta según tus necesidades
-            layoutParams5.topMargin = 700;  // Ajusta según tus necesidades
+            layoutParams5.leftMargin = 80;  // Ajusta según tus necesidades
+            layoutParams5.topMargin = 680;  // Ajusta según tus necesidades
             contadorSilencioTextView.setLayoutParams(layoutParams5);
 
-            ConstraintLayout.LayoutParams layoutParams6 = (ConstraintLayout.LayoutParams) textVocal.getLayoutParams();
-            layoutParams6.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
-            layoutParams6.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-            layoutParams6.leftMargin = 1;  // Ajusta según tus necesidades
-            layoutParams6.topMargin = 80;  // Ajusta según tus necesidades
-            textVocal.setLayoutParams(layoutParams6);
+
             startVoiceRecognition();
             isActive = true;
             thread.start();
@@ -491,14 +540,12 @@ public class dura_largo extends AppCompatActivity {
                 startTimeVowelMap.clear();
                 isListening = true;
 
-                SpannableString spannableString = new SpannableString("Debes llegar a : " + duraTime + "   \nsegundos");
-                // Aplica el color rojo solo para la variable 'segundos'
+                SpannableString spannableString = new SpannableString("Debes \n llegar\n a : " + duraTime + "   \nsegundos");
                 ForegroundColorSpan colorRojo = new ForegroundColorSpan(colorP);
                 int inicio = spannableString.toString().indexOf(String.valueOf(duraTime));
                 int fin = inicio + String.valueOf(duraTime).length();
                 spannableString.setSpan(colorRojo, inicio, fin, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 tiempoDura.setText(spannableString);
-                //tiempoDura.setText("Debes llegar a :"+duraTime+" \nsegundos");
             }
 
             @Override
@@ -641,15 +688,13 @@ public class dura_largo extends AppCompatActivity {
                 if (tiempoPronunciacion != null) {
                     int colorP = ContextCompat.getColor(this, R.color.blue);
 
-                    SpannableString spannableString = new SpannableString("Llevas: " + segundos + "   \nsegundos");
-                    // Aplica el color rojo solo para la variable 'segundos'
+                    SpannableString spannableString = new SpannableString("Llevas:\n " + segundos + "   \nsegundos");
                     ForegroundColorSpan colorRojo = new ForegroundColorSpan(colorP);
                     int inicio = spannableString.toString().indexOf(String.valueOf(segundos));
                     int fin = inicio + String.valueOf(segundos).length();
                     spannableString.setSpan(colorRojo, inicio, fin, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     tiempoPronunciacion.setText(spannableString);
 
-                    //tiempoPronunciacion.setText("Llevas: " + segundos + "   \nsegundos");
                     if (segundos >= duration && !isPuntuacionContada && countDownTimer==null) {
                         puntos1++;
                         isPuntuacionContada = true;
@@ -662,7 +707,7 @@ public class dura_largo extends AppCompatActivity {
 
                         if (imagePoint!= null) {
 
-                            imagePoint.setVisibility(View.VISIBLE);
+                            imagePoint.setVisibility(View.INVISIBLE);
                             startSilenceCountdown();
                         }
                         Log.d("Puntos", "Puntos: " + puntos1);
@@ -680,7 +725,7 @@ public class dura_largo extends AppCompatActivity {
                     } else if (segundos < duration) {
                         // Restablecer el indicador si el tiempo es inferior a la duración
                         isPuntuacionContada = false;
-                        //imagePoint.setVisibility(View.INVISIBLE);
+                        imagePoint.setVisibility(View.INVISIBLE);
 
                     }
                 } else {
@@ -701,24 +746,17 @@ public class dura_largo extends AppCompatActivity {
             public void onTick(long millisUntilFinished) {
                 silenceCount++;
                 updateSilenceCountTextView(silenceCount);
-                // Obtén los parámetros de diseño actuales del ConstraintLayout
-                ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) silence.getLayoutParams();
 
-                // Establece las nuevas dimensiones (ancho y alto) en píxeles (ajusta según tus necesidades)
+                ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) silence.getLayoutParams();
                 layoutParams.width = 200;  // Ancho
                 layoutParams.height = 200; // Alto
-
-                // Establece las nuevas restricciones de posición (izquierda y arriba)
                 layoutParams.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID; // o establece la restricción izquierda con respecto a otra vista
                 layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;   // o establece la restricción superior con respecto a otra vista
-
-                // Establece las nuevas coordenadas (márgenes izquierdo y superior) en píxeles (ajusta según tus necesidades)
-                layoutParams.leftMargin = 300;  // Márgen izquierdo
-                layoutParams.topMargin = 300;   // Márgen superior
-
-                // Aplica los nuevos parámetros de diseño al ConstraintLayout
+                layoutParams.leftMargin = 200;  // Márgen izquierdo
+                layoutParams.topMargin = 320;   // Márgen superior
                 silence.setLayoutParams(layoutParams);
                 silence.setVisibility(View.VISIBLE);
+
                 // Verifica si la persona está en silencio
                 if (isSilent) {
                     progressBar.incrementProgressBy(1);  // Incrementa la barra de progreso en 1
@@ -768,7 +806,7 @@ public class dura_largo extends AppCompatActivity {
         speechRecognizer.stopListening();
         ///Toast.makeText(this, "Se ha alcanzado el límite de conteos. ¡Se acabó!", Toast.LENGTH_SHORT).show();
         mostrarImagenEspecial();
-        mostrarResultado();
+        ejecutarMostrarResultadoConDelay(3000);
 
     }
     private void resetConteoYBarra() {
@@ -781,7 +819,13 @@ public class dura_largo extends AppCompatActivity {
     // Obtén los resultados del reconocimiento de voz
 
     private void updateSilenceCountTextView(int count) {
-        contadorSilencioTextView.setText("Tiempo en silencio: " + count);
+        String textoCompleto = "Tiempo en silencio: " + count + "  segundos";
+        SpannableString spannableString = new SpannableString(textoCompleto);
+        int inicioCount = textoCompleto.indexOf(String.valueOf(count));
+        int finCount = inicioCount + String.valueOf(count).length();
+        spannableString.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.yellow)), inicioCount, finCount, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        contadorSilencioTextView.setText(spannableString);
 
     }
     private void updateTvResult(String text) {
@@ -844,32 +888,77 @@ public class dura_largo extends AppCompatActivity {
         return input.replaceAll("[^aeiouAEIOU]", "");
     }
 
+    private void ejecutarMostrarResultadoConDelay(long delayMillis) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mostrarResultado();
+            }
+        }, delayMillis);
+    }
+
     private void mostrarResultado() {
+        LinearLayout linearLayoutResultado = findViewById(R.id.linearLayoutResultado);
+
         SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
         String veces = preferences.getString("veces", "5");
         Integer repeticionest=Integer.parseInt(veces);
         Integer repeticionestt=repeticionest*2;
-        // Inflar el layout personalizado
         View resultadoView = getLayoutInflater().inflate(R.layout.layout_result, null);
 
-        // Obtener el TextView del layout
+        TextView textMessage = resultadoView.findViewById(R.id.textMessage);
         TextView textResultado = resultadoView.findViewById(R.id.puntostt);
         TextView textPosibles = resultadoView.findViewById(R.id.puntospos);
         ImageView imageResultado = resultadoView.findViewById(R.id.imageView);
 
+        LinearLayout.LayoutParams layoutParamsTextResultado = (LinearLayout.LayoutParams) textResultado.getLayoutParams();
+        layoutParamsTextResultado.leftMargin = 20;  // Ajusta la coordenada X
+        layoutParamsTextResultado.topMargin = 15;  // Ajusta la coordenada Y
+        textResultado.setLayoutParams(layoutParamsTextResultado);
+
+        LinearLayout.LayoutParams layoutParamsTextResultado2 = (LinearLayout.LayoutParams) textPosibles.getLayoutParams();
+        layoutParamsTextResultado2.leftMargin = 20;  // Ajusta la coordenada X
+        layoutParamsTextResultado2.topMargin = 1;  // Ajusta la coordenada Y
+        textPosibles.setLayoutParams(layoutParamsTextResultado2);
+
+        LinearLayout.LayoutParams layoutParamsTextResultado3 = (LinearLayout.LayoutParams) textMessage.getLayoutParams();
+        layoutParamsTextResultado3.leftMargin = 50;  // Ajusta la coordenada X
+        layoutParamsTextResultado3.topMargin = 0;  // Ajusta la coordenada Y
+        textMessage.setLayoutParams(layoutParamsTextResultado3);
+
+        LinearLayout.LayoutParams layoutParamsImage = (LinearLayout.LayoutParams) imageResultado.getLayoutParams();
+        layoutParamsImage.leftMargin = 50;  // Ajusta la coordenada X
+        layoutParamsImage.topMargin = 1;  // Ajusta la coordenada Y
+
         // Establecer el número de puntos en el TextView (ajusta esto según tu lógica)
-        textResultado.setText("Puntos: " + puntos1);
-        textPosibles.setText("Posibles: " +repeticionestt);
+        textResultado.setText("Puntos obtenidos: " + puntos1);
+        textPosibles.setText("Puntos Posibles : " +repeticionestt);
         // Lógica para determinar la imagen según la cantidad de puntos
         if (puntos1 >= repeticionestt) {
             // Si obtuvo la mayor cantidad de puntos posibles
             imageResultado.setImageResource(R.drawable.star5);
+            textMessage.setText("Muy bien completaste el ejercicio correctamente");
+            layoutParamsImage.width = 400;  // Ajusta el ancho según tus necesidades
+            layoutParamsImage.height = 200;
+            imageResultado.setLayoutParams(layoutParamsImage);
+
         } else if (puntos1 >= repeticionestt / 2) {
             // Si obtuvo al menos la mitad de los puntos posibles
             imageResultado.setImageResource(R.drawable.star3);
+            textMessage.setText("Por poco  \n ¡Intentemoslo de nuevo y consigamos\n 5 estrellas!");
+            layoutParamsImage.width = 500;  // Ajusta el ancho según tus necesidades
+            layoutParamsImage.height = 300;
+            imageResultado.setLayoutParams(layoutParamsImage);
+
+
         } else {
             // Si obtuvo menos de la mitad de los puntos posibles
             imageResultado.setImageResource(R.drawable.star1);
+            textMessage.setText("Podemos hacerlo mejor \n ¡Intentemoslo de nuevo!");
+            layoutParamsImage.width = 600;  // Ajusta el ancho según tus necesidades
+            layoutParamsImage.height = 500;
+            imageResultado.setLayoutParams(layoutParamsImage);
+
         }
 
         // Mostrar el layout resultado en un AlertDialog o en cualquier otro contenedor deseado
@@ -888,24 +977,35 @@ public class dura_largo extends AppCompatActivity {
         alertDialog.show();
     }
     private void mostrarImagenEspecial() {
+        puntos.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
+        tvResult.setVisibility(View.INVISIBLE);
+        tiempoDura.setVisibility(View.INVISIBLE);
+        tiempoPronunciacion.setVisibility(View.INVISIBLE);
+        textVocal.setVisibility(View.INVISIBLE);
+        silence.setVisibility(View.INVISIBLE);
+        contadorSilencioTextView.setVisibility(View.INVISIBLE);
+
         // Aquí puedes mostrar la imagen especial, por ejemplo, cambiar la imagen de un ImageView
         ImageView imageView = findViewById(R.id.trofeo);
         // Establecer las dimensiones deseadas (ajusta los valores según tus necesidades)
-        int widthInPixels = 100;  // Ancho en píxeles
-        int heightInPixels = 100; // Altura en píxeles
+        int widthInPixels = 400;  // Ancho en píxeles
+        int heightInPixels = 400; // Altura en píxeles
 
-        // Configurar los parámetros de diseño
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                widthInPixels,
-                heightInPixels
-        );
 
+
+        ConstraintLayout.LayoutParams layoutParams11 = (ConstraintLayout.LayoutParams) imageView.getLayoutParams();
+        layoutParams11.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams11.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        layoutParams11.leftMargin = 100;  // Ajusta según tus necesidades
+        layoutParams11.topMargin = 400;  // Ajusta según tus necesidades
+        layoutParams11.width = widthInPixels;
+        layoutParams11.height = heightInPixels;
         // Establecer los parámetros de diseño en el ImageView
-        imageView.setLayoutParams(layoutParams);
+        imageView.setLayoutParams(layoutParams11);
         imageView.setImageResource(R.drawable.trofeo);
         imageView.setVisibility(View.VISIBLE);;
 
-        // También puedes realizar otras acciones necesarias después de la última repetición
     }
     private void stopVoiceAcquisitionPlayback() {
         isActive = false;

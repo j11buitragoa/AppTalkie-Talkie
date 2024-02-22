@@ -23,6 +23,9 @@
     <string name="rhythmText"> Duración Larga</string>
     <string name="imitarText">Duración Staccato</string>
     <string name="switchName">Admin</string>
+    <string name="todo">TODO</string>
+    <string name="puntos_posibles">Puntos posibles :</string>
+    <string name="puntos_totales">Puntos totales</string>
     <string-array name="vocales_array">
         <item>a</item>
         <item>e</item>

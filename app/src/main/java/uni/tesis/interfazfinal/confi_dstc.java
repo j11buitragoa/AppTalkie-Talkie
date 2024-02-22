@@ -12,6 +12,9 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -53,38 +56,126 @@ public class confi_dstc extends AppCompatActivity {
         silencio_time =  findViewById(R.id.silencio);
         listagrab =  findViewById(R.id.listagrab);
         cargarListaGrabaciones();
-        start.setOnClickListener(new View.OnClickListener() {
+
+        nfonema.addTextChangedListener(new TextWatcher() {
 
             @Override
-            public void onClick(View view) {
-                Log.d("Nombre grab", "Valor de nombreGrabacionSeleccionada en onClick: " + nombreGrabacionSeleccionada);
-                if (nombreGrabacionSeleccionada != null && !nombreGrabacionSeleccionada.isEmpty()) {
-                    SharedPreferences preferences = getSharedPreferences("Preferences_new", Context.MODE_PRIVATE);
-                    String fonema = nfonema.getText().toString();
-                    String repeticiones = Rep.getText().toString();
-                    String silencio = silencio_time.getText().toString();
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("repeticiones", repeticiones);
-                    editor.putString("silencio", silencio);
-                    editor.putString("fonema", fonema);
+            }
 
-                    editor.putString("nombreGrabacion", nombreGrabacionSeleccionada);
-                    editor.apply();
-
-                    Log.d(TAG, "silencio" + silencio);
-                    Log.d(TAG, "repeticiones" + repeticiones);
-                    Log.d(TAG, "fonema" + fonema);
-                    Log.d(TAG, "nombreGrabacion" + nombreGrabacionSeleccionada);
-                    Intent intent = new Intent(confi_dstc.this, repro_staccato.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    // Si no se ha seleccionado una grabación, mostrar un mensaje al usuario
-                    Toast.makeText(confi_dstc.this, "Por favor, seleccione una grabación", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                if (s.toString().trim().isEmpty()) {
+                    start.setEnabled(false);
                 }
             }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
         });
+
+        Rep.addTextChangedListener(new TextWatcher() {
+                                       @Override
+                                       public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                                       }
+
+                                       @Override
+                                       public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                                           if (s.toString().trim().isEmpty()) {
+                                               start.setEnabled(false);
+                                           } else {
+                                               try {
+                                                   int valor = Integer.parseInt(s.toString());
+                                                   if (valor >= 1 && valor <= 10) {
+                                                       start.setEnabled(true);
+                                                   } else {
+                                                       start.setEnabled(false);
+                                                   }
+                                               } catch (NumberFormatException e) {
+                                                   start.setEnabled(false);
+                                               }
+                                           }
+
+                                       }
+
+                                       @Override
+                                       public void afterTextChanged(Editable s) {
+
+                                       }
+        });
+        silencio_time.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int i, int i2, int i3) {
+                if (s.toString().trim().isEmpty()) {
+                    start.setEnabled(false);
+                } else {
+                    try {
+                        int valor = Integer.parseInt(s.toString());
+                        if (valor >= 1 && valor <= 10) {
+                            start.setEnabled(true);
+                        } else {
+                            start.setEnabled(false);
+                        }
+                    } catch (NumberFormatException e) {
+                        start.setEnabled(false);
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+                start.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+                        Log.d("Nombre grab", "Valor de nombreGrabacionSeleccionada en onClick: " + nombreGrabacionSeleccionada);
+                        if (nombreGrabacionSeleccionada != null && !nombreGrabacionSeleccionada.isEmpty()) {
+                            SharedPreferences preferences = getSharedPreferences("Preferences_new", Context.MODE_PRIVATE);
+                            String fonema = nfonema.getText().toString();
+                            String repeticiones = Rep.getText().toString();
+                            String silencio = silencio_time.getText().toString();
+
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.putString("repeticiones", repeticiones);
+                            editor.putString("silencio", silencio);
+                            editor.putString("fonema", fonema);
+
+                            editor.putString("nombreGrabacion", nombreGrabacionSeleccionada);
+                            editor.apply();
+
+                            Log.d(TAG, "silencio" + silencio);
+                            Log.d(TAG, "repeticiones" + repeticiones);
+                            Log.d(TAG, "fonema" + fonema);
+                            Log.d(TAG, "nombreGrabacion" + nombreGrabacionSeleccionada);
+
+                            if (TextUtils.isEmpty(fonema) || TextUtils.isEmpty(silencio) || TextUtils.isEmpty(repeticiones)) {
+                                // Mostrar un mensaje o tomar alguna acción para indicar que los campos deben llenarse
+                                Toast.makeText(confi_dstc.this, "Todos los campos deben estar llenos", Toast.LENGTH_SHORT).show();
+
+                            } else {
+                                Intent intent = new Intent(confi_dstc.this, repro_staccato.class);
+                                startActivity(intent);
+                                finish();
+                            }
+
+                        } else {
+                            // Si no se ha seleccionado una grabación, mostrar un mensaje al usuario
+                            Toast.makeText(confi_dstc.this, "Por favor, seleccione una grabación", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
         listagrab.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
 
             @Override
@@ -131,6 +222,7 @@ public class confi_dstc extends AppCompatActivity {
         try {
             // Simplificamos la construcción de la ruta del archivo
             File file = new File(nombreGrabacion);
+            Log.d(TAG, "Ruta del archivo: " + file.getAbsolutePath());
 
             if (!file.exists()) {
                 Log.e(TAG, "El archivo no existe: " + file.getAbsolutePath());
