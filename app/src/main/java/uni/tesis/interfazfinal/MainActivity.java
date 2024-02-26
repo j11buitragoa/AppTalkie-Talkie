@@ -5,11 +5,13 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.icu.util.Calendar;
 import android.media.tv.TvContract;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -82,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         userDocRef = db.collection(USERS_COLLECTION).document(user.getEmail());
 
         ImageView logout=findViewById(R.id.logout);
+        ImageView about=findViewById(R.id.about);
         ImageView confiInt=findViewById(R.id.confiInt);
         ImageView escucInt=findViewById(R.id.escucInt);
         ImageView hablaInt=findViewById(R.id.hablaInt);
@@ -89,6 +92,26 @@ public class MainActivity extends AppCompatActivity {
         logout.setOnClickListener(view -> {
             // Llamada a la función de log out
             logout();
+        });
+
+        about.setOnClickListener(view -> {
+            String urlVideo = "https://youtu.be/e8tVHJpOgEc";
+
+            // Crear un Intent con la acción ACTION_VIEW
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+
+            // Establecer la URL del video en el Intent
+            intent.setData(Uri.parse(urlVideo));
+
+            // Intentar iniciar la actividad para abrir el video
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                // Manejar la excepción si no se encuentra una actividad para manejar la intención
+                e.printStackTrace();
+
+                // Puedes mostrar un mensaje de error o proporcionar una alternativa aquí
+            }
         });
 
         confiInt.setOnClickListener(v ->

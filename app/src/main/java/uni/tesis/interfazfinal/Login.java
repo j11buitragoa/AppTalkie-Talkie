@@ -4,9 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -72,6 +75,7 @@ public class Login extends AppCompatActivity {
         password = findViewById(R.id.password);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        ImageView about=findViewById(R.id.about);
 
         loginButtonReg = findViewById(R.id.loginButtonReg);
         loginButton = findViewById(R.id.loginButtonLog);
@@ -81,6 +85,25 @@ public class Login extends AppCompatActivity {
         });
 
         loginButtonReg.setOnClickListener(v -> showRegisterDialog());
+        about.setOnClickListener(view -> {
+            String urlVideo = "https://youtu.be/e8tVHJpOgEc";
+
+            // Crear un Intent con la acción ACTION_VIEW
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+
+            // Establecer la URL del video en el Intent
+            intent.setData(Uri.parse(urlVideo));
+
+            // Intentar iniciar la actividad para abrir el video
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                // Manejar la excepción si no se encuentra una actividad para manejar la intención
+                e.printStackTrace();
+
+                // Puedes mostrar un mensaje de error o proporcionar una alternativa aquí
+            }
+        });
     }
 
     private void loginUser(){
